@@ -40,12 +40,22 @@ h1, h2, h3, h4 {
     font-size: 2em;
 }
 
+.beta {
+    font-size: 1.5em;
+}
+
 .background {
     fill: white;
 }
 
 .group__background {
-    fill: #ffc;
+    fill: white;
+    stroke: $grey;
+    stroke-width: 2px;
+}
+
+.group__name {
+    @extend .beta;
 }
 
 #header {
