@@ -17,18 +17,18 @@
       "freqClientProblemBehaviour": 3,
 
       "behaviours": {
-        "alcohol": {
-          "heavy": 3,
-          "moderate": 3,
-          "light": 3,
-          "abstain": 3
-        },
-        "other": {
-          "heavy": 3,
-          "moderate": 3,
-          "light": 3,
-          "abstain": 3
-        }
+        "alcohol": [
+          { "heavy":    3 },
+          { "moderate": 3 },
+          { "light":    3 },
+          { "abstain":  3 }
+        ],
+        "other": [
+          { "heavy":    3 },
+          { "moderate": 3 },
+          { "light":    3 },
+          { "abstain":  3 }
+        ]
       }
     },
     {
@@ -44,18 +44,18 @@
       "freqClientProblemBehaviour": 3,
 
       "behaviours": {
-        "alcohol": {
-          "heavy": 4,
-          "moderate": 4,
-          "light": 4,
-          "abstain": 4
-        },
-        "other": {
-          "heavy": 4,
-          "moderate": 4,
-          "light": 4,
-          "abstain": 4
-        }
+        "alcohol": [
+          { "heavy":    4 },
+          { "moderate": 4 },
+          { "light":    4 },
+          { "abstain":  4 }
+        ],
+        "other": [
+          { "heavy":    4 },
+          { "moderate": 4 },
+          { "light":    4 },
+          { "abstain":  4 }
+        ]
       }
     }
   ],
