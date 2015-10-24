@@ -13,6 +13,8 @@ To serve the files, open another tab and run:
 
 (Assumes browser-sync is installed globally)
 
+    npm install -g browser-sync
+
 
 ## Schema
 
