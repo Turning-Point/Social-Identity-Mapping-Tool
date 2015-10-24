@@ -2,6 +2,8 @@
 import d3 from 'd3';
 import _ from 'lodash';
 
+import groupComponent from './group';
+
 d3.json('./data/data.json', function (data) {
 
   console.log('data', data);
@@ -23,23 +25,12 @@ d3.json('./data/data.json', function (data) {
       .attr('height', height)
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+
   const groups = svg.append('g')
     .attr('class', 'groups');
 
   const group = groups.selectAll('.group')
-    .data(data.groups);
-
-  // enter
-  const groupInner = group.enter().append('g')
-    .attr('class', 'group')
-    .attr('transform', function(d) {
-      return 'translate(' + 100 + ',' + 100 + ')';
-    })
-    .append('rect')
-      .attr('class', 'group__background')
-      .attr('width', 200)
-      .attr('height', 100);
-
-
+    .data(data.groups)
+    .call(groupComponent);
 
 });
