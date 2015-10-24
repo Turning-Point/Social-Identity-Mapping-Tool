@@ -1,12 +1,72 @@
 {
+  "client": {
+    "pdoc": "alcohol"
+  },
+
   "groups": [
     {
       "id": 0,
-      "name": "Football Club"
+      "name": "Footy Club",
+      "pax": 6,
+      "identification": 6,
+
+      "supportForProblemBehaviour": 3,
+      "supportForRecoveryBehaviour": 3,
+
+      "freqGroupProblemBehaviour": 3,
+      "freqClientProblemBehaviour": 3,
+
+      "behaviours": {
+        "alcohol": {
+          "heavy": 3,
+          "moderate": 3,
+          "light": 3,
+          "abstain": 3
+        },
+        "other": {
+          "heavy": 3,
+          "moderate": 3,
+          "light": 3,
+          "abstain": 3
+        }
+      }
     },
     {
       "id": 1,
-      "name": "Home"
+      "name": "Park",
+      "pax": 12,
+      "identification": 3,
+
+      "supportForProblemBehaviour": 3,
+      "supportForRecoveryBehaviour": 3,
+
+      "freqGroupProblemBehaviour": 3,
+      "freqClientProblemBehaviour": 3,
+
+      "behaviours": {
+        "alcohol": {
+          "heavy": 3,
+          "moderate": 3,
+          "light": 3,
+          "abstain": 3
+        },
+        "other": {
+          "heavy": 3,
+          "moderate": 3,
+          "light": 3,
+          "abstain": 3
+        }
+      }
+    }
+  ],
+
+  "links": [
+    {
+      "source": 0,
+      "target": 1,
+      "conflict": null,
+      "compatibility": null,
+      "commonality": null
     }
   ]
 }

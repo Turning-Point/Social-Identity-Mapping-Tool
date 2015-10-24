@@ -13,4 +13,16 @@ Get the dependencies:
 
     bower install
 
-    
+## Schema
+
+A seven point likert scale is used to measure dimensions such as identificationLevel. 
+
+Missing data is reresented as `null`.
+
+behviours
+
+- alcoholLevel
+- 
+- drugLevel
+- 
+
