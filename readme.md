@@ -2,16 +2,17 @@
 # Social Identity Mapping Tool
 
 
-## Install
+## Install, run!
 
-Assumes browser-sync and bower are are installed globally:
+    npm install
+    npm start
 
-    npm install -g browser-sync
-    npm install -g bower
+To serve the files, open another tab and run:
 
-Get the dependencies:
+    browser-sync start --server --directory --files "**"
 
-    bower install
+(Assumes browser-sync is installed globally)
+
 
 ## Schema
 

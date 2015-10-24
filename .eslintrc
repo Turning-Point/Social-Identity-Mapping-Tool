@@ -1,0 +1,23 @@
+{
+  "extends": "airbnb",
+  "globals": {
+    "__DEV__"      : false,
+    "__PROD__"     : false,
+    "__DEBUG__"    : false,
+    "__DEBUG_NW__" : false
+  },
+  "rules": {
+    "no-console": 0,
+    "no-debugger": 0,
+    "no-unused-vars": [0],
+    "brace-style": [2, "stroustrup", { "allowSingleLine": true }],
+    "comma-dangle": [1, "never"],
+    "key-spacing": [0, {
+      "beforeColon": true,
+      "afterColon": true
+    }],
+    "no-else-return": 0,
+    "space-before-function-paren": [0, "always"],
+    "react/jsx-quotes": [0, "single"]
+  }
+}
