@@ -12,9 +12,10 @@ export default function group(selection) {
     .attr('class', 'group')
     .attr('transform', function(d, i) {
       const yOffset = i * (HEIGHT + 20);
-      return 'translate(' + 100 + ',' + yOffset  + ')';
-    })
-    .append('rect')
+      return 'translate(' + 0 + ',' + yOffset  + ')';
+    });
+
+  groupInner.append('rect')
       .attr('class', 'group__background')
       .attr('width', WIDTH)
       .attr('height', HEIGHT);

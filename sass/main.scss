@@ -1,4 +1,23 @@
 
+
+$red:        #B22A25;  // (heavy)
+$yellow:     #F2B33D;  // (casual)
+$green:      #089A36;  // (in recovery)
+$light-blue: #9CC8D9;  // (non-user)
+
+// conflict:
+
+$red:        #B22A25;  // (lot of conflict)
+$orange:     #F29441;  // (some conflict)
+$grey:       #D7DCDD;  // (no conflict)
+
+
+// common:
+
+$dark-blue:  #2976A6;  // (lot in common)
+$light-blue: #9CC8D9;  // (something in common)
+$grey:       #D7DCDD;  // (nothing in common)
+
 * {
     box-sizing: border-box;
 }
@@ -11,7 +30,7 @@ body {
 }
 
 .background {
-    fill: #ffe;
+    fill: white;
 }
 
 .group__background {

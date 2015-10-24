@@ -45,16 +45,16 @@
 
       "behaviours": {
         "alcohol": {
-          "heavy": 3,
-          "moderate": 3,
-          "light": 3,
-          "abstain": 3
+          "heavy": 4,
+          "moderate": 4,
+          "light": 4,
+          "abstain": 4
         },
         "other": {
-          "heavy": 3,
-          "moderate": 3,
-          "light": 3,
-          "abstain": 3
+          "heavy": 4,
+          "moderate": 4,
+          "light": 4,
+          "abstain": 4
         }
       }
     }
