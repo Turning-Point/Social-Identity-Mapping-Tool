@@ -1,4 +1,6 @@
 
+import _ from 'lodash';
+
 export default function group(parent, data) {
 
   console.info('groups', parent);
@@ -35,25 +37,38 @@ function barComponent(parent) {
     .data( d => {
       console.log(d.behaviours.alcohol);
       return d.behaviours.alcohol;
-    });
+    })
+
+    // parent.data().behaviours.alcohol.forEach(level => {
+    //   console.log('level', level);
+    //   level.values.forEach(function(item){
+    //     totals[item.x] = (totals[item.x] || 0 ) + item.y
+    //   });
+    // });
 
   // enter
   bar.enter().append('rect')
     .attr('class', 'group__bar');
+    // .call(makeBars);
+
+  let xOffset = 0;
 
   // update
-  bar.attr('x', (d, i) => mapCumulativeBars )
+  bar.attr('x', (d, i) => {
+    const prevOffset = xOffset;
+    xOffset = xOffset + d.level * 20;
+    return prevOffset;
+  })
     .attr('y', 0)
-    .attr('width', 20)
+    .attr('width', d => d.level * 20)
     .attr('height', 30)
     .style('fill', 'red');
 }
 
-export function toggleAod() {
-  console.log('toggleAod');
+function makeBars(data) {
+  console.log('makeBars', data);
 }
 
-fucntion mapCumulativeBars(d, i) {
-  console.log('d,i', d,i);
-  return d[Object.keys(d)] * 20;
+export function toggleAod() {
+  console.log('toggleAod');
 }

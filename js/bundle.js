@@ -1,6 +1,81 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports['default'] = group;
+exports.toggleAod = toggleAod;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+function group(parent, data) {
+
+  console.info('groups', parent);
+
+  var HEIGHT = 150;
+  var WIDTH = 200;
+
+  var groupInner = parent.selectAll('.group').data(data.groups);
+
+  // enter
+  groupInner.enter().append('g').attr('class', 'group').attr('transform', function (d, i) {
+    var yOffset = i * (HEIGHT + 20);
+    return 'translate(' + 0 + ',' + yOffset + ')';
+  });
+
+  groupInner.append('rect').attr('class', 'group__background').attr('width', WIDTH).attr('height', HEIGHT);
+
+  groupInner.call(barComponent);
+}
+
+function barComponent(parent) {
+
+  var barGroup = parent.append('g').attr('class', 'barGroup');
+
+  var bar = barGroup.selectAll('.group__bar').data(function (d) {
+    console.log(d.behaviours.alcohol);
+    return d.behaviours.alcohol;
+  });
+
+  // parent.data().behaviours.alcohol.forEach(level => {
+  //   console.log('level', level);
+  //   level.values.forEach(function(item){
+  //     totals[item.x] = (totals[item.x] || 0 ) + item.y
+  //   });
+  // });
+
+  // enter
+  bar.enter().append('rect').attr('class', 'group__bar');
+  // .call(makeBars);
+
+  var xOffset = 0;
+
+  // update
+  bar.attr('x', function (d, i) {
+    var prevOffset = xOffset;
+    xOffset = xOffset + d.level * 20;
+    return prevOffset;
+  }).attr('y', 0).attr('width', function (d) {
+    return d.level * 20;
+  }).attr('height', 30).style('fill', 'red');
+}
+
+function makeBars(data) {
+  console.log('makeBars', data);
+}
+
+function toggleAod() {
+  console.log('toggleAod');
+}
+
+},{"lodash":4}],2:[function(require,module,exports){
+'use strict';
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _d3 = require('d3');
@@ -11,32 +86,32 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-_d32['default'].json('./data/data.json', function (data) {
+var _group = require('./group');
 
-  console.log('data', data);
+var _group2 = _interopRequireDefault(_group);
+
+_d32['default'].json('./data/data.json', function (error, data) {
+  if (error) throw error;
+
+  console.info('data', data);
 
   var body = document.querySelector('body');
+  var height = body.clientHeight;
+  var width = body.clientWidth;
+  var padding = 20;
 
-  var margin = { top: 0, right: 25, bottom: 25, left: 0 };
-  var padding = 25;
-  var height = body.clientHeight - margin.top - margin.bottom;
-  var width = body.clientWidth - margin.left - margin.right;
+  var svg = _d32['default'].select('svg').attr('width', width).attr('height', height);
 
-  var svg = _d32['default'].select('svg').attr('width', width + margin.left + margin.right).attr('height', height + margin.top + margin.bottom);
+  svg.append('rect').attr('class', 'background').attr('width', width).attr('height', height);
 
-  svg.append('rect').attr('class', 'background').attr('width', width).attr('height', height).attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+  var groups = svg.append('g').attr('class', 'groups').attr('transform', 'translate(' + padding + ', ' + padding + ')');
 
-  var groups = svg.append('g').attr('class', 'groups');
+  groups.call(_group2['default'], data);
 
-  var group = groups.selectAll('.group').data(data.groups);
-
-  // enter
-  var groupInner = group.enter().append('g').attr('class', 'group').attr('transform', function (d) {
-    return 'translate(' + 100 + ',' + 100 + ')';
-  }).append('rect').attr('class', 'group__background').attr('width', 200).attr('height', 100);
+  _d32['default'].select('.toggle-aod').on('click', _group.toggleAod);
 });
 
-},{"d3":2,"lodash":3}],2:[function(require,module,exports){
+},{"./group":1,"d3":3,"lodash":4}],3:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.6"
@@ -9541,7 +9616,7 @@ _d32['default'].json('./data/data.json', function (data) {
   if (typeof define === "function" && define.amd) define(d3); else if (typeof module === "object" && module.exports) module.exports = d3;
   this.d3 = d3;
 }();
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -21897,7 +21972,7 @@ _d32['default'].json('./data/data.json', function (data) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}]},{},[1])
+},{}]},{},[2])
 
 
 //# sourceMappingURL=bundle.js.map
