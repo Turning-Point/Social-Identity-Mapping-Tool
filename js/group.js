@@ -1,14 +1,16 @@
 
-export default function group(selection) {
+export default function group(parent, data) {
 
-  console.info('groups', selection);
+  console.info('groups', parent);
 
-  // height will be keyed off identification
   const HEIGHT = 150;
   const WIDTH = 200;
 
+  const groupInner = parent.selectAll('.group')
+    .data(data.groups);
+
   // enter
-  const groupInner = selection.enter().append('g')
+  groupInner.enter().append('g')
     .attr('class', 'group')
     .attr('transform', function(d, i) {
       const yOffset = i * (HEIGHT + 20);

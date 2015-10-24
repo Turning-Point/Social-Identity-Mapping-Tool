@@ -21,13 +21,9 @@ d3.json('./data/data.json', function (data) {
       .attr('width', width)
       .attr('height', height);
 
-
   const groups = svg.append('g')
     .attr('class', 'groups')
     .attr('transform', 'translate(' + 20 + ',' + 20 + ')');
 
-  const group = groups.selectAll('.group')
-    .data(data.groups)
-    .call(groupComponent);
-
+  groups.call(groupComponent, data);
 });
