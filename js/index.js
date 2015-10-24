@@ -2,7 +2,7 @@
 import d3 from 'd3';
 import _ from 'lodash';
 
-import { groupComponent, toggleAod } from './group';
+import groupComponent, { toggleAod } from './group';
 
 d3.json('./data/data.json', function (error, data) {
   if (error) throw error;
@@ -12,6 +12,7 @@ d3.json('./data/data.json', function (error, data) {
   const body = document.querySelector('body');
   const height = body.clientHeight;
   const width = body.clientWidth;
+  const padding = 20;
 
 	const svg = d3.select('svg')
     .attr('width', width)
@@ -24,7 +25,7 @@ d3.json('./data/data.json', function (error, data) {
 
   const groups = svg.append('g')
     .attr('class', 'groups')
-    .attr('transform', 'translate(' + 20 + ',' + 20 + ')');
+    .attr('transform', `translate(${padding}, ${padding})`);
 
   groups.call(groupComponent, data);
 
