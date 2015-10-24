@@ -4,7 +4,8 @@ import _ from 'lodash';
 
 import { groupComponent, toggleAod } from './group';
 
-d3.json('./data/data.json', function (data) {
+d3.json('./data/data.json', function (error, data) {
+  if (error) throw error;
 
   console.info('data', data);
 
