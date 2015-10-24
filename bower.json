@@ -1,0 +1,19 @@
+{
+  "name": "Social-Identity-Mapping-Tool",
+  "main": "index.js",
+  "version": "0.0.0",
+  "authors": [
+    "Tim Osborn <tim@memelab.com.au>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "~3.5.6"
+  }
+}
