@@ -6,7 +6,7 @@ import groupComponent from './group';
 
 d3.json('./data/data.json', function (data) {
 
-  console.log('data', data);
+  console.info('data', data);
 
   const body = document.querySelector('body');
 
