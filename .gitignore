@@ -1,0 +1,61 @@
+# Yeoman
+# https://github.com/github/gitignore/blob/f41b7ce7919f236d3dfa1559649417404504522e/Yeoman.gitignore
+
+node_modules/
+bower_components/
+*.log
+
+build/
+dist/
+.sass-cache/
+.tmp/
+
+# OSX specific
+# https://github.com/github/gitignore/blob/master/Global%2FOSX.gitignore
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+
+# Sublime Text
+# https://github.com/github/gitignore/blob/master/Global%2FSublimeText.gitignore
+
+# cache files for sublime text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+
+# workspace files are user-specific
+*.sublime-workspace
+
+# project files should be checked into the repository, unless a significant
+# proportion of contributors will probably not be using SublimeText
+# *.sublime-project
+
+# sftp configuration file
+sftp-config.json
+
+# Rope
+.ropeproject/
+
+# Vim swap
+*.swp
