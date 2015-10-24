@@ -2,7 +2,7 @@
 import d3 from 'd3';
 import _ from 'lodash';
 
-import groupComponent from './group';
+import { groupComponent, toggleAod } from './group';
 
 d3.json('./data/data.json', function (data) {
 
@@ -26,4 +26,6 @@ d3.json('./data/data.json', function (data) {
     .attr('transform', 'translate(' + 20 + ',' + 20 + ')');
 
   groups.call(groupComponent, data);
+
+  d3.select('.toggle-aod').on('click', toggleAod);
 });

@@ -22,4 +22,7 @@ export default function group(parent, data) {
       .attr('width', WIDTH)
       .attr('height', HEIGHT);
 
+
+export function toggleAod() {
+  console.log('toggleAod');
 }

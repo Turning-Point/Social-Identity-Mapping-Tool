@@ -27,6 +27,7 @@ body {
     padding: 0;
     margin: 0;
     height: 100%;
+    font-family: sans-serif;
 }
 
 .background {
@@ -35,4 +36,27 @@ body {
 
 .group__background {
     fill: #ffc;
+}
+
+#header {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    min-height: 50px;
+}
+
+.toggle-aod {
+    @extend .button;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.5em;
+}
+
+.button {
+    padding: 0.5em;
+    background-color: $light-blue;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
 }
