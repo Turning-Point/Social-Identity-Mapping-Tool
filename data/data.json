@@ -16,6 +16,15 @@
       "freqGroupProblemBehaviour": 3,
       "freqClientProblemBehaviour": 3,
 
+      "conflict": null,
+      "compatibility": null,
+      "commonality": null,
+
+      "tags": [
+        "fighting",
+        "high expectations"
+      ],
+
       "behaviours": {
         "alcohol": [
           { "name": "heavy",    "level": 3 },
@@ -42,6 +51,14 @@
 
       "freqGroupProblemBehaviour": 3,
       "freqClientProblemBehaviour": 3,
+
+      "conflict": null,
+      "compatibility": null,
+      "commonality": null,
+
+      "tags": [
+        "outdoors"
+      ],
 
       "behaviours": {
         "alcohol": [
