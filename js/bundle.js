@@ -52,8 +52,8 @@ var _groupBarComponent = require('./groupBarComponent');
 var _groupBarComponent2 = _interopRequireDefault(_groupBarComponent);
 
 var config = {
-  WIDTH: 400,
-  HEIGHT: 300
+  WIDTH: 300,
+  HEIGHT: 200
 };
 
 function group(parent, data) {
@@ -75,12 +75,8 @@ function group(parent, data) {
   var groupInner = parent.selectAll('.group').data(data.groups);
 
   // enter
-  var addedGroups = groupInner.enter().append('g').attr('class', 'group').style('filter', "url(#drop-shadow)").attr('transform', function (d, i) {
-    // console.log('groupInner', d);
-    var yOffset = i * (config.HEIGHT + 20);
-    d.x = 0;
-    d.y = yOffset;
-    return 'translate(' + d.x + ',' + d.y + ')';
+  var addedGroups = groupInner.enter().append('g').attr('class', 'group').style('filter', "url(#drop-shadow)").attr('transform', function (d) {
+    return 'translate(' + [d.x, d.y] + ')';
   }).call(drag);
 
   // Card BG

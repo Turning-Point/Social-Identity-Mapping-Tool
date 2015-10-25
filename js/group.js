@@ -2,8 +2,8 @@
 import barComponent from './groupBarComponent';
 
 const config = {
-  WIDTH: 400,
-  HEIGHT: 300
+  WIDTH: 300,
+  HEIGHT: 200
 }
 
 export default function group(parent, data) {
@@ -32,12 +32,8 @@ export default function group(parent, data) {
       .append('g')
       .attr('class', 'group')
       .style('filter', "url(#drop-shadow)")
-      .attr('transform', function(d, i) {
-        // console.log('groupInner', d);
-        const yOffset = i * (config.HEIGHT + 20);
-        d.x = 0;
-        d.y = yOffset;
-        return 'translate(' + d.x + ',' + d.y  + ')';
+      .attr('transform', d => {
+        return 'translate(' + [d.x, d.y] + ')';
       })
       .call(drag)
 
