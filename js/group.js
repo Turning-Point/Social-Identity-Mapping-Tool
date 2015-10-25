@@ -21,6 +21,8 @@ export default function group(parent, data) {
       return 'translate(' + 0 + ',' + yOffset  + ')';
     });
 
+
+
   groupInner.append('rect')
       .attr('class', 'group__background')
       .attr('width', WIDTH)
@@ -39,7 +41,7 @@ function barComponent(parent) {
     .data( d => {
       let xOffset = 0;
 
-      const total = _.total(d.behaviours.alcohol, group => group.level);
+      const total = _.sum(d.behaviours.alcohol, group => group.level);
 
       _.each(d.behaviours.alcohol, (segment) => {
         const prevOffset = xOffset;

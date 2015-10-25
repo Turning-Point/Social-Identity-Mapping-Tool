@@ -41,7 +41,7 @@ function barComponent(parent) {
   var bar = barGroup.selectAll('.group__bar').data(function (d) {
     var xOffset = 0;
 
-    var total = _lodash2['default'].total(d.behaviours.alcohol, function (group) {
+    var total = _lodash2['default'].sum(d.behaviours.alcohol, function (group) {
       return group.level;
     });
 
@@ -106,7 +106,7 @@ _d32['default'].json('./data/data.json', function (error, data) {
 
   svg.append('rect').attr('class', 'background').attr('width', width).attr('height', height);
 
-  var groups = svg.append('g').attr('class', 'groups').attr('transform', 'translate(' + padding + ', ' + padding + ')');
+  var groups = svg.append('g').attr('class', 'groups').attr('transform', 'translate(' + padding + ', 80)');
 
   groups.call(_group2['default'], data);
 
