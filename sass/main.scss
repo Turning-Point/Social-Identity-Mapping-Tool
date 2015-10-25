@@ -1,22 +1,24 @@
 
+$grey:       #d7dcdd;
+$red:        #b22a25;
+$orange:     #f29441;
+$yellow:     #f2b33d;
+$green:      #089a36;
+$blue-dark:  #2976a6;
+$blue-light: #9cc8d9;
 
-$red:        #B22A25;  // (heavy)
-$yellow:     #F2B33D;  // (casual)
-$green:      #089A36;  // (in recovery)
-$light-blue: #9CC8D9;  // (non-user)
+$use-heavy:     $red;
+$use-mid:       $green;
+$use-light:     $yellow;
+$use-abstain:   $blue-light;
 
-// conflict:
+$conflict-high: $red;
+$conflict-mid:  $orange;
+$conflict-none: $grey;
 
-$red:        #B22A25;  // (lot of conflict)
-$orange:     #F29441;  // (some conflict)
-$grey:       #D7DCDD;  // (no conflict)
-
-
-// common:
-
-$dark-blue:  #2976A6;  // (lot in common)
-$light-blue: #9CC8D9;  // (something in common)
-$grey:       #D7DCDD;  // (nothing in common)
+$common-high:   $blue-dark;
+$common-some:   $blue-light;
+$common-none:   $grey;
 
 * {
     box-sizing: border-box;
@@ -27,7 +29,19 @@ body {
     padding: 0;
     margin: 0;
     height: 100%;
-    font-family: sans-serif;
+    font-family: 'Slabo 27px', serif;
+    color: $blue-dark;
+}
+
+h1, h2, h3, h4 {
+    font-size: 1em;
+}
+.alpha {
+    font-size: 2em;
+}
+
+.beta {
+    font-size: 1.5em;
 }
 
 .background {
@@ -35,7 +49,13 @@ body {
 }
 
 .group__background {
-    fill: #ffc;
+    fill: white;
+    stroke: $grey;
+    stroke-width: 2px;
+}
+
+.group__name {
+    @extend .beta;
 }
 
 #header {
@@ -43,6 +63,7 @@ body {
     top: 0;
     width: 100%;
     min-height: 50px;
+    text-align: center;
 }
 
 .toggle-aod {
@@ -55,8 +76,13 @@ body {
 
 .button {
     padding: 0.5em;
-    background-color: $light-blue;
+    background-color: $blue-light;
     border-radius: 5px;
     color: white;
     cursor: pointer;
 }
+
+.palette-1 { fill: $red; }
+.palette-2 { fill: $orange; }
+.palette-3 { fill: $yellow; }
+.palette-4 { fill: $blue-light; }

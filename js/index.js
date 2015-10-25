@@ -25,7 +25,7 @@ d3.json('./data/data.json', function (error, data) {
 
   const groups = svg.append('g')
     .attr('class', 'groups')
-    .attr('transform', `translate(${padding}, ${padding})`);
+    .attr('transform', `translate(${padding}, 80)`);
 
   groups.call(groupComponent, data);
 

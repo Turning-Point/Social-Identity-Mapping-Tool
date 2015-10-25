@@ -1,12 +1,13 @@
 
 import _ from 'lodash';
 
+const HEIGHT = 150;
+const WIDTH = 200;
+
 export default function group(parent, data) {
 
   console.info('groups', parent);
 
-  const HEIGHT = 150;
-  const WIDTH = 200;
 
   const groupInner = parent.selectAll('.group')
     .data(data.groups);
@@ -15,9 +16,12 @@ export default function group(parent, data) {
   groupInner.enter().append('g')
     .attr('class', 'group')
     .attr('transform', function(d, i) {
+      // console.log('groupInner', d);
       const yOffset = i * (HEIGHT + 20);
       return 'translate(' + 0 + ',' + yOffset  + ')';
     });
+
+
 
   groupInner.append('rect')
       .attr('class', 'group__background')
@@ -35,34 +39,31 @@ function barComponent(parent) {
 
   const bar = barGroup.selectAll('.group__bar')
     .data( d => {
-      console.log(d.behaviours.alcohol);
-      return d.behaviours.alcohol;
-    })
+      let xOffset = 0;
 
-    // parent.data().behaviours.alcohol.forEach(level => {
-    //   console.log('level', level);
-    //   level.values.forEach(function(item){
-    //     totals[item.x] = (totals[item.x] || 0 ) + item.y
-    //   });
-    // });
+      const total = _.sum(d.behaviours.alcohol, group => group.level);
+
+      _.each(d.behaviours.alcohol, (segment) => {
+        const prevOffset = xOffset;
+        xOffset = xOffset + (segment.level / total) * WIDTH;
+        segment.offset = prevOffset;
+        segment.width = (segment.level / total) * WIDTH;
+      });
+      return d.behaviours.alcohol;
+    });
 
   // enter
   bar.enter().append('rect')
     .attr('class', 'group__bar');
-    // .call(makeBars);
-
-  let xOffset = 0;
 
   // update
-  bar.attr('x', (d, i) => {
-    const prevOffset = xOffset;
-    xOffset = xOffset + d.level * 20;
-    return prevOffset;
-  })
+  bar.attr('x', d => d.offset)
+    .attr('class', (d, i) => {
+      return 'palette-' + (i + 1);
+    })
     .attr('y', 0)
-    .attr('width', d => d.level * 20)
+    .attr('width', d => d.width)
     .attr('height', 30)
-    .style('fill', 'red');
 }
 
 function makeBars(data) {
