@@ -6,6 +6,7 @@ $yellow:     #f2b33d;
 $green:      #089a36;
 $blue-dark:  #2976a6;
 $blue-light: #9cc8d9;
+$grey-light: #f9fbfc;
 
 $use-heavy:     $red;
 $use-mid:       $green;
@@ -49,9 +50,9 @@ h1, h2, h3, h4 {
 }
 
 .group__background {
-    fill: white;
-    stroke: $grey;
-    stroke-width: 2px;
+    fill: $grey-light;
+    stroke: white;
+    stroke-width: 10px;
 }
 
 .group__name {

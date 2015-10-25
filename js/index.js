@@ -3,6 +3,7 @@ import d3 from 'd3';
 import _ from 'lodash';
 
 import groupComponent, { toggleAod } from './group';
+import filterDefs from './filters';
 
 d3.json('./data/data.json', function (error, data) {
   if (error) throw error;
@@ -17,6 +18,9 @@ d3.json('./data/data.json', function (error, data) {
 	const svg = d3.select('svg')
     .attr('width', width)
     .attr('height', height);
+
+  // add drop shadows
+  svg.call(filterDefs);
 
   svg.append('rect')
       .attr('class', 'background')

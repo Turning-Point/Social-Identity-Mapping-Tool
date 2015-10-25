@@ -1,0 +1,38 @@
+
+// http://bl.ocks.org/cpbotha/5200394
+export default function group(svg) {
+
+  // filters go in defs element
+  const defs = svg.append('defs');
+
+  // create filter with id #drop-shadow
+  // height=130% so that the shadow is not clipped
+  const filter = defs.append('filter')
+      .attr('id', 'drop-shadow')
+      .attr('height', '120%');
+
+  // SourceAlpha refers to opacity of graphic that this filter will be applied to
+  // convolve that with a Gaussian with standard deviation 3 and store result
+  // in blur
+  filter.append('feGaussianBlur')
+      .attr('in', 'SourceAlpha')
+      .attr('stdDeviation', 3)
+      .attr('result', 'blur');
+
+  // translate output of Gaussian blur to the right and downwards with 2px
+  // store result in offsetBlur
+  filter.append('feOffset')
+      .attr('in', 'blur')
+      .attr('dx', 0)
+      .attr('dy', 0)
+      .attr('result', 'offsetBlur');
+
+  // overlay original SourceGraphic over translated blurred opacity by using
+  // feMerge filter. Order of specifying inputs is important!
+  const feMerge = filter.append('feMerge');
+
+  feMerge.append('feMergeNode')
+      .attr('in', 'offsetBlur')
+  feMerge.append('feMergeNode')
+      .attr('in', 'SourceGraphic');
+}

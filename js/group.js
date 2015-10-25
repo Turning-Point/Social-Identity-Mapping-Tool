@@ -15,6 +15,7 @@ export default function group(parent, data) {
   // enter
   groupInner.enter().append('g')
     .attr('class', 'group')
+    .style("filter", "url(#drop-shadow)")
     .attr('transform', function(d, i) {
       // console.log('groupInner', d);
       const yOffset = i * (HEIGHT + 50);

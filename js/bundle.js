@@ -1,4 +1,42 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+
+// http://bl.ocks.org/cpbotha/5200394
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+exports['default'] = group;
+
+function group(svg) {
+
+    // filters go in defs element
+    var defs = svg.append('defs');
+
+    // create filter with id #drop-shadow
+    // height=130% so that the shadow is not clipped
+    var filter = defs.append('filter').attr('id', 'drop-shadow').attr('height', '120%');
+
+    // SourceAlpha refers to opacity of graphic that this filter will be applied to
+    // convolve that with a Gaussian with standard deviation 3 and store result
+    // in blur
+    filter.append('feGaussianBlur').attr('in', 'SourceAlpha').attr('stdDeviation', 3).attr('result', 'blur');
+
+    // translate output of Gaussian blur to the right and downwards with 2px
+    // store result in offsetBlur
+    filter.append('feOffset').attr('in', 'blur').attr('dx', 0).attr('dy', 0).attr('result', 'offsetBlur');
+
+    // overlay original SourceGraphic over translated blurred opacity by using
+    // feMerge filter. Order of specifying inputs is important!
+    var feMerge = filter.append('feMerge');
+
+    feMerge.append('feMergeNode').attr('in', 'offsetBlur');
+    feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+}
+
+module.exports = exports['default'];
+
+},{}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -23,7 +61,7 @@ function group(parent, data) {
   var groupInner = parent.selectAll('.group').data(data.groups);
 
   // enter
-  groupInner.enter().append('g').attr('class', 'group').attr('transform', function (d, i) {
+  groupInner.enter().append('g').attr('class', 'group').style("filter", "url(#drop-shadow)").attr('transform', function (d, i) {
     // console.log('groupInner', d);
     var yOffset = i * (HEIGHT + 50);
     return 'translate(' + 0 + ',' + yOffset + ')';
@@ -36,6 +74,15 @@ function group(parent, data) {
   groupInner.append('image').attr('xlink:href', '/assets/gender-female.svg').attr('x', WIDTH / 2 - 50).attr('y', -20).attr('width', 100).attr('height', 100);
 
   // Conflict, Commonality Icons
+  groupInner.append('image').attr('xlink:href', function (d) {
+    var degree = 'lots';
+    return '/assets/icon-conflict-' + degree + '.svg';
+  }).attr('x', WIDTH / 2 - 100).attr('y', 15).attr('width', 30).attr('height', 30);
+
+  groupInner.append('image').attr('xlink:href', function (d) {
+    var degree = 'lots';
+    return '/assets/icon-common-' + degree + '.svg';
+  }).attr('x', WIDTH / 2 + 100 - 30).attr('y', 15).attr('width', 30).attr('height', 30);
 
   // Card Title
   groupInner.append('text').attr('x', WIDTH / 2).attr('y', 130).attr('width', WIDTH).attr('class', 'group__name').text(function (d) {
@@ -87,7 +134,7 @@ function toggleAod() {
   console.log('toggleAod');
 }
 
-},{"lodash":4}],2:[function(require,module,exports){
+},{"lodash":5}],3:[function(require,module,exports){
 'use strict';
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -104,6 +151,10 @@ var _group = require('./group');
 
 var _group2 = _interopRequireDefault(_group);
 
+var _filters = require('./filters');
+
+var _filters2 = _interopRequireDefault(_filters);
+
 _d32['default'].json('./data/data.json', function (error, data) {
   if (error) throw error;
 
@@ -116,6 +167,9 @@ _d32['default'].json('./data/data.json', function (error, data) {
 
   var svg = _d32['default'].select('svg').attr('width', width).attr('height', height);
 
+  // add drop shadows
+  svg.call(_filters2['default']);
+
   svg.append('rect').attr('class', 'background').attr('width', width).attr('height', height);
 
   var groups = svg.append('g').attr('class', 'groups').attr('transform', 'translate(' + padding + ', 80)');
@@ -125,7 +179,7 @@ _d32['default'].json('./data/data.json', function (error, data) {
   _d32['default'].select('.toggle-aod').on('click', _group.toggleAod);
 });
 
-},{"./group":1,"d3":3,"lodash":4}],3:[function(require,module,exports){
+},{"./filters":1,"./group":2,"d3":4,"lodash":5}],4:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.6"
@@ -9630,7 +9684,7 @@ _d32['default'].json('./data/data.json', function (error, data) {
   if (typeof define === "function" && define.amd) define(d3); else if (typeof module === "object" && module.exports) module.exports = d3;
   this.d3 = d3;
 }();
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -21986,7 +22040,7 @@ _d32['default'].json('./data/data.json', function (error, data) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}]},{},[2])
+},{}]},{},[3])
 
 
 //# sourceMappingURL=bundle.js.map
