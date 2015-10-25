@@ -13,17 +13,18 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var HEIGHT = 150;
+var WIDTH = 200;
+
 function group(parent, data) {
 
   console.info('groups', parent);
-
-  var HEIGHT = 150;
-  var WIDTH = 200;
 
   var groupInner = parent.selectAll('.group').data(data.groups);
 
   // enter
   groupInner.enter().append('g').attr('class', 'group').attr('transform', function (d, i) {
+    // console.log('groupInner', d);
     var yOffset = i * (HEIGHT + 20);
     return 'translate(' + 0 + ',' + yOffset + ')';
   });
@@ -38,31 +39,32 @@ function barComponent(parent) {
   var barGroup = parent.append('g').attr('class', 'barGroup');
 
   var bar = barGroup.selectAll('.group__bar').data(function (d) {
-    console.log(d.behaviours.alcohol);
+    var xOffset = 0;
+
+    var total = _lodash2['default'].total(d.behaviours.alcohol, function (group) {
+      return group.level;
+    });
+
+    _lodash2['default'].each(d.behaviours.alcohol, function (segment) {
+      var prevOffset = xOffset;
+      xOffset = xOffset + segment.level / total * WIDTH;
+      segment.offset = prevOffset;
+      segment.width = segment.level / total * WIDTH;
+    });
     return d.behaviours.alcohol;
   });
 
-  // parent.data().behaviours.alcohol.forEach(level => {
-  //   console.log('level', level);
-  //   level.values.forEach(function(item){
-  //     totals[item.x] = (totals[item.x] || 0 ) + item.y
-  //   });
-  // });
-
   // enter
   bar.enter().append('rect').attr('class', 'group__bar');
-  // .call(makeBars);
-
-  var xOffset = 0;
 
   // update
-  bar.attr('x', function (d, i) {
-    var prevOffset = xOffset;
-    xOffset = xOffset + d.level * 20;
-    return prevOffset;
+  bar.attr('x', function (d) {
+    return d.offset;
+  }).attr('class', function (d, i) {
+    return 'palette-' + (i + 1);
   }).attr('y', 0).attr('width', function (d) {
-    return d.level * 20;
-  }).attr('height', 30).style('fill', 'red');
+    return d.width;
+  }).attr('height', 30);
 }
 
 function makeBars(data) {

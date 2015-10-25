@@ -1,12 +1,13 @@
 
 import _ from 'lodash';
 
+const HEIGHT = 150;
+const WIDTH = 200;
+
 export default function group(parent, data) {
 
   console.info('groups', parent);
 
-  const HEIGHT = 150;
-  const WIDTH = 200;
 
   const groupInner = parent.selectAll('.group')
     .data(data.groups);
@@ -38,11 +39,13 @@ function barComponent(parent) {
     .data( d => {
       let xOffset = 0;
 
+      const total = _.total(d.behaviours.alcohol, group => group.level);
+
       _.each(d.behaviours.alcohol, (segment) => {
         const prevOffset = xOffset;
-        xOffset = xOffset + segment.level * 20;
+        xOffset = xOffset + (segment.level / total) * WIDTH;
         segment.offset = prevOffset;
-        console.log('segment', segment);
+        segment.width = (segment.level / total) * WIDTH;
       });
       return d.behaviours.alcohol;
     });
@@ -53,10 +56,12 @@ function barComponent(parent) {
 
   // update
   bar.attr('x', d => d.offset)
+    .attr('class', (d, i) => {
+      return 'palette-' + (i + 1);
+    })
     .attr('y', 0)
-    .attr('width', d => d.level * 20)
+    .attr('width', d => d.width)
     .attr('height', 30)
-    .style('fill', 'red');
 }
 
 function makeBars(data) {
