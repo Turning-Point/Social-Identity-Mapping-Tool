@@ -49,6 +49,10 @@ h1, h2, h3, h4 {
     fill: white;
 }
 
+.group {
+  cursor: move;
+}
+
 .group__background {
     fill: $grey-light;
     stroke: white;

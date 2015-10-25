@@ -58,81 +58,103 @@ function group(parent, data) {
 
   console.info('groups', parent);
 
+  data.groups.forEach(function (group) {
+    group.pdoc = data.client.pdoc;
+  });
+
+  var drag = d3.behavior.drag().origin(function (d) {
+    return d;
+  }).on('drag', function (d) {
+    d.x = d3.event.x;
+    d.y = d3.event.y;
+    d3.select(this).attr('transform', 'translate(' + d.x + ',' + d.y + ')');
+  });
+
   var groupInner = parent.selectAll('.group').data(data.groups);
 
   // enter
-  groupInner.enter().append('g').attr('class', 'group').style("filter", "url(#drop-shadow)").attr('transform', function (d, i) {
+  var addedGroups = groupInner.enter().append('g').attr('class', 'group').style('filter', "url(#drop-shadow)").attr('transform', function (d, i) {
     // console.log('groupInner', d);
-    var yOffset = i * (HEIGHT + 50);
-    return 'translate(' + 0 + ',' + yOffset + ')';
-  });
+    var yOffset = i * (HEIGHT + 20);
+    d.x = 0;
+    d.y = yOffset;
+    return 'translate(' + d.x + ',' + d.y + ')';
+  }).call(drag);
 
   // Card BG
-  groupInner.append('rect').attr('class', 'group__background').attr('width', WIDTH).attr('height', HEIGHT);
+  addedGroups.append('rect').attr('class', 'group__background').attr('width', WIDTH).attr('height', HEIGHT);
+
+  // Card Title
+  addedGroups.append('text').attr('x', WIDTH / 2).attr('y', 130).attr('width', WIDTH).attr('class', 'group__name').text(function (d) {
+    return d.name;
+  });
 
   // User Icon
-  groupInner.append('image').attr('xlink:href', '/assets/gender-female.svg').attr('x', WIDTH / 2 - 50).attr('y', -20).attr('width', 100).attr('height', 100);
+  addedGroups.append('image').attr('xlink:href', '/assets/gender-female.svg').attr('x', WIDTH / 2 - 50).attr('y', -20).attr('width', 100).attr('height', 100);
 
   // Conflict Icon
-  groupInner.append('image').attr('xlink:href', function (d) {
+  addedGroups.append('image').attr('xlink:href', function (d) {
     var degree = iconScale(d.conflict);
     return '/assets/icon-conflict-' + degree + '.svg';
   }).attr('x', WIDTH / 2 - 100).attr('y', 15).attr('width', 30).attr('height', 30);
 
   // Commonality Icon
-  groupInner.append('image').attr('xlink:href', function (d) {
+  addedGroups.append('image').attr('xlink:href', function (d) {
     var degree = iconScale(d.commonality);
     return '/assets/icon-common-' + degree + '.svg';
   }).attr('x', WIDTH / 2 + 100 - 30).attr('y', 15).attr('width', 30).attr('height', 30);
 
-  // Card Title
-  groupInner.append('text').attr('x', WIDTH / 2).attr('y', 130).attr('width', WIDTH).attr('class', 'group__name').text(function (d) {
-    return d.name;
-  });
-
-  // Card Tags
   groupInner.call(barComponent);
 }
 
 function barComponent(parent) {
+  var barGroup = parent.select('.group__bars');
 
-  var barGroup = parent.append('g').attr('class', 'barGroup').attr('transform', 'translate(' + 0 + ', ' + (HEIGHT - 40) + ')');
+  if (barGroup.empty()) {
+    barGroup = parent.append('g').attr('class', 'group__bars').attr('transform', 'translate(' + 0 + ', ' + (HEIGHT - 50) + ')');
+  }
 
   var bar = barGroup.selectAll('.group__bar').data(function (d) {
     var xOffset = 0;
 
-    var total = _lodash2['default'].sum(d.behaviours.alcohol, function (group) {
+    var behaviours = d.behaviours[d.pdoc];
+
+    var total = _lodash2['default'].sum(behaviours, function (group) {
       return group.level;
     });
 
-    _lodash2['default'].each(d.behaviours.alcohol, function (segment) {
+    _lodash2['default'].each(behaviours, function (segment) {
       var prevOffset = xOffset;
       xOffset = xOffset + segment.level / total * WIDTH;
       segment.offset = prevOffset;
       segment.width = segment.level / total * WIDTH;
     });
-    return d.behaviours.alcohol;
+    return behaviours;
   });
 
   // enter
-  bar.enter().append('rect').attr('class', 'group__bar');
+  bar.enter().append('rect');
 
   // update
-  bar.attr('x', function (d) {
+  bar.attr('class', function (d, i) {
+    return 'group__bar palette-' + (i + 1);
+  }).attr('y', 0).attr('height', 50).transition().duration(500).attr('x', function (d) {
     return d.offset;
-  }).attr('class', function (d, i) {
-    return 'palette-' + (i + 1);
-  }).attr('y', 0).attr('width', function (d) {
+  }).attr('width', function (d) {
     return d.width;
-  }).attr('height', 40);
+  });
 }
 
-function makeBars(data) {
-  console.log('makeBars', data);
-}
+function toggleAod(update_function, data) {
+  return function () {
+    if (data.client.pdoc == 'alcohol') {
+      data.client.pdoc = 'other';
+    } else {
+      data.client.pdoc = 'alcohol';
+    }
 
-function toggleAod() {
-  console.log('toggleAod');
+    update_function();
+  };
 }
 
 function iconScale(data) {
@@ -186,9 +208,13 @@ _d32['default'].json('./data/data.json', function (error, data) {
 
   var groups = svg.append('g').attr('class', 'groups').attr('transform', 'translate(' + padding + ', 80)');
 
-  groups.call(_group2['default'], data);
+  var updateGroups = function updateGroups() {
+    groups.call(_group2['default'], data);
+  };
 
-  _d32['default'].select('.toggle-aod').on('click', _group.toggleAod);
+  updateGroups();
+
+  _d32['default'].select('.toggle-aod').on('click', (0, _group.toggleAod)(updateGroups, data));
 });
 
 },{"./filters":1,"./group":2,"d3":4,"lodash":5}],4:[function(require,module,exports){
