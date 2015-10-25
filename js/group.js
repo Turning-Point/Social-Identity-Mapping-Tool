@@ -36,6 +36,26 @@ export default function group(parent, data) {
       .attr('height', 100);
 
   // Conflict, Commonality Icons
+  groupInner.append('image')
+      .attr('xlink:href', d => {
+        const degree = 'lots';
+        return `/assets/icon-conflict-${degree}.svg`;
+      })
+      .attr('x', WIDTH / 2 - 100)
+      .attr('y', 15)
+      .attr('width', 30)
+      .attr('height', 30);
+
+  groupInner.append('image')
+      .attr('xlink:href', d => {
+        const degree = 'lots';
+        return `/assets/icon-common-${degree}.svg`;
+      })
+      .attr('x', WIDTH / 2 + 100 - 30)
+      .attr('y', 15)
+      .attr('width', 30)
+      .attr('height', 30);
+
 
   // Card Title
   groupInner.append('text')
