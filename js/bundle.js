@@ -13,8 +13,8 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var HEIGHT = 150;
-var WIDTH = 200;
+var WIDTH = 400;
+var HEIGHT = 300;
 
 function group(parent, data) {
 
@@ -25,22 +25,30 @@ function group(parent, data) {
   // enter
   groupInner.enter().append('g').attr('class', 'group').attr('transform', function (d, i) {
     // console.log('groupInner', d);
-    var yOffset = i * (HEIGHT + 20);
+    var yOffset = i * (HEIGHT + 50);
     return 'translate(' + 0 + ',' + yOffset + ')';
   });
 
+  // Card BG
   groupInner.append('rect').attr('class', 'group__background').attr('width', WIDTH).attr('height', HEIGHT);
 
-  groupInner.append('text').attr('x', WIDTH / 2).attr('y', 30).attr('width', WIDTH).attr('class', 'group__name').text(function (d) {
+  // User Icon
+  groupInner.append('image').attr('xlink:href', '/assets/gender-female.svg').attr('x', WIDTH / 2 - 50).attr('y', -20).attr('width', 100).attr('height', 100);
+
+  // Conflict, Commonality Icons
+
+  // Card Title
+  groupInner.append('text').attr('x', WIDTH / 2).attr('y', 130).attr('width', WIDTH).attr('class', 'group__name').text(function (d) {
     return d.name;
   });
 
+  // Card Tags
   groupInner.call(barComponent);
 }
 
 function barComponent(parent) {
 
-  var barGroup = parent.append('g').attr('class', 'barGroup').attr('transform', 'translate(' + 0 + ', ' + (HEIGHT - 50) + ')');
+  var barGroup = parent.append('g').attr('class', 'barGroup').attr('transform', 'translate(' + 0 + ', ' + (HEIGHT - 40) + ')');
 
   var bar = barGroup.selectAll('.group__bar').data(function (d) {
     var xOffset = 0;
@@ -68,7 +76,7 @@ function barComponent(parent) {
     return 'palette-' + (i + 1);
   }).attr('y', 0).attr('width', function (d) {
     return d.width;
-  }).attr('height', 50);
+  }).attr('height', 40);
 }
 
 function makeBars(data) {

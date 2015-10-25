@@ -1,8 +1,8 @@
 
 import _ from 'lodash';
 
-const HEIGHT = 150;
-const WIDTH = 200;
+const WIDTH = 400;
+const HEIGHT = 300;
 
 export default function group(parent, data) {
 
@@ -17,22 +17,35 @@ export default function group(parent, data) {
     .attr('class', 'group')
     .attr('transform', function(d, i) {
       // console.log('groupInner', d);
-      const yOffset = i * (HEIGHT + 20);
+      const yOffset = i * (HEIGHT + 50);
       return 'translate(' + 0 + ',' + yOffset  + ')';
     });
 
+  // Card BG
   groupInner.append('rect')
       .attr('class', 'group__background')
       .attr('width', WIDTH)
       .attr('height', HEIGHT);
 
+  // User Icon
+  groupInner.append('image')
+      .attr('xlink:href', '/assets/gender-female.svg')
+      .attr('x', WIDTH / 2 - 50)
+      .attr('y', -20)
+      .attr('width', 100)
+      .attr('height', 100);
+
+  // Conflict, Commonality Icons
+
+  // Card Title
   groupInner.append('text')
     .attr('x', WIDTH / 2)
-    .attr('y', 30)
+    .attr('y', 130)
     .attr('width', WIDTH)
     .attr('class', 'group__name')
     .text(d => d.name);
 
+  // Card Tags
   groupInner.call(barComponent);
 }
 
@@ -41,7 +54,7 @@ function barComponent(parent) {
 
   const barGroup = parent.append('g')
     .attr('class', 'barGroup')
-    .attr('transform', `translate(${0}, ${HEIGHT - 50})`)
+    .attr('transform', `translate(${0}, ${HEIGHT - 40})`)
 
   const bar = barGroup.selectAll('.group__bar')
     .data( d => {
@@ -69,7 +82,7 @@ function barComponent(parent) {
     })
     .attr('y', 0)
     .attr('width', d => d.width)
-    .attr('height', 50)
+    .attr('height', 40)
 }
 
 function makeBars(data) {

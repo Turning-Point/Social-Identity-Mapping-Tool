@@ -55,7 +55,7 @@ h1, h2, h3, h4 {
 }
 
 .group__name {
-    @extend .beta;
+    @extend .alpha;
     fill: $blue-dark;
     text-anchor: middle;
 }
@@ -88,3 +88,10 @@ h1, h2, h3, h4 {
 .palette-2 { fill: $orange; }
 .palette-3 { fill: $yellow; }
 .palette-4 { fill: $blue-light; }
+
+.tag {
+    background-color: $grey;
+    color: white;
+    padding: 6px;
+    border-radius: 5px;
+}
