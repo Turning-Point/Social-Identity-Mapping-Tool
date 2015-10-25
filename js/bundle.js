@@ -56,6 +56,8 @@ var config = {
   HEIGHT: 200
 };
 
+exports.config = config;
+
 function group(parent, data) {
 
   console.info('groups', parent);
@@ -248,6 +250,8 @@ Object.defineProperty(exports, '__esModule', {
 });
 exports['default'] = drawLink;
 
+var _group = require('./group');
+
 var lineWidth = 10;
 
 function drawLink(parent, data) {
@@ -266,11 +270,43 @@ function link(parent, d, data) {
 
   // get the source location
   // get the target location
-  var source = [data.groups[d.source].x, data.groups[d.source].y];
-  var target = [data.groups[d.target].x, data.groups[d.target].y];
+  var source = {};
+  source.x = data.groups[d.source].x;
+  source.y = data.groups[d.source].y;
+
+  var target = {};
+  target.x = data.groups[d.target].x;
+  target.y = data.groups[d.target].y;
+
+  var sourceOffset = {};
+  var targetOffset = {};
+
+  if (source.x < target.x) {
+    sourceOffset.x = source.x + _group.config.WIDTH;
+    targetOffset.x = target.x;
+
+    if (source.y < target.y) {
+      sourceOffset.y = source.y + 100;
+      targetOffset.y = target.y + 100;
+    } else {
+      sourceOffset.y = source.y + 100;
+      targetOffset.y = target.y + 100;
+    }
+  } else {
+    sourceOffset.x = source.x + _group.config.WIDTH / 2;
+    targetOffset.x = target.x + _group.config.WIDTH / 2;
+
+    if (source.y < target.y) {
+      sourceOffset.y = source.y + _group.config.HEIGHT;
+      targetOffset.y = target.y - 10; //cos of avatar
+    } else {
+        sourceOffset.y = source.y;
+        targetOffset.y = target.y;
+      }
+  }
 
   console.log('source, target', source, target);
-  var linkPath = "M" + source + "L" + target;
+  var linkPath = "M" + [sourceOffset.x, sourceOffset.y] + "L" + [targetOffset.x, targetOffset.y];
   // data.coordinates.slice(1).forEach(function(knot) {
   //   linkPath += " L" + knot;
   // });
@@ -279,7 +315,7 @@ function link(parent, d, data) {
 }
 module.exports = exports['default'];
 
-},{}],6:[function(require,module,exports){
+},{"./group":2}],6:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.6"

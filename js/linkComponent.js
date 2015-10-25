@@ -1,5 +1,6 @@
 
 const lineWidth = 10;
+import { config } from './group';
 
 export default function drawLink(parent, data) {
 
@@ -21,11 +22,49 @@ function link(parent, d, data) {
 
   // get the source location
   // get the target location
-  const source = [ data.groups[d.source].x, data.groups[d.source].y ];
-  const target = [ data.groups[d.target].x, data.groups[d.target].y ];
+  let source = {};
+  source.x = data.groups[d.source].x;
+  source.y = data.groups[d.source].y;
+
+  let target = {};
+  target.x = data.groups[d.target].x;
+  target.y = data.groups[d.target].y;
+
+  let sourceOffset = {};
+  let targetOffset = {};
+
+  if (source.x < target.x) {
+    sourceOffset.x = source.x + config.WIDTH;
+    targetOffset.x = target.x;
+
+    if (source.y < target.y) {
+      sourceOffset.y = source.y + 100;
+      targetOffset.y = target.y + 100;
+    }
+    else {
+      sourceOffset.y = source.y + 100;
+      targetOffset.y = target.y + 100;
+    }
+
+  }
+  else {
+    sourceOffset.x = source.x + config.WIDTH / 2;
+    targetOffset.x = target.x + config.WIDTH / 2;
+
+    if (source.y < target.y) {
+      sourceOffset.y = source.y + config.HEIGHT;
+      targetOffset.y = target.y - 10; //cos of avatar
+    }
+    else {
+      sourceOffset.y = source.y;
+      targetOffset.y = target.y;
+    }
+
+  }
+
 
   console.log('source, target', source, target);
-  var linkPath = "M" + source + "L" + target;
+  var linkPath = "M" + [sourceOffset.x, sourceOffset.y] + "L" + [targetOffset.x, targetOffset.y];
   // data.coordinates.slice(1).forEach(function(knot) {
   //   linkPath += " L" + knot;
   // });

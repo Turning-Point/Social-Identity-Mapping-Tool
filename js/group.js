@@ -1,7 +1,7 @@
 
 import barComponent from './groupBarComponent';
 
-const config = {
+export const config = {
   WIDTH: 300,
   HEIGHT: 200
 }
