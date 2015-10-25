@@ -6,6 +6,7 @@ $yellow:     #f2b33d;
 $green:      #089a36;
 $blue-dark:  #2976a6;
 $blue-light: #9cc8d9;
+$grey-light: #f9fbfc;
 
 $use-heavy:     $red;
 $use-mid:       $green;
@@ -48,14 +49,18 @@ h1, h2, h3, h4 {
     fill: white;
 }
 
+.group {
+  cursor: move;
+}
+
 .group__background {
-    fill: white;
-    stroke: $grey;
-    stroke-width: 2px;
+    fill: $grey-light;
+    stroke: white;
+    stroke-width: 10px;
 }
 
 .group__name {
-    @extend .beta;
+    @extend .alpha;
     fill: $blue-dark;
     text-anchor: middle;
 }
@@ -88,3 +93,10 @@ h1, h2, h3, h4 {
 .palette-2 { fill: $orange; }
 .palette-3 { fill: $yellow; }
 .palette-4 { fill: $blue-light; }
+
+.tag {
+    background-color: $grey;
+    color: white;
+    padding: 6px;
+    border-radius: 5px;
+}
