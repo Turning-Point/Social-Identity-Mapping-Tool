@@ -36,10 +36,10 @@ export default function group(parent, data) {
       .attr('width', 100)
       .attr('height', 100);
 
-  // Conflict, Commonality Icons
+  // Conflict Icon
   groupInner.append('image')
       .attr('xlink:href', d => {
-        const degree = 'lots';
+        const degree = iconScale(d.conflict);
         return `/assets/icon-conflict-${degree}.svg`;
       })
       .attr('x', WIDTH / 2 - 100)
@@ -47,9 +47,10 @@ export default function group(parent, data) {
       .attr('width', 30)
       .attr('height', 30);
 
+  // Commonality Icon
   groupInner.append('image')
       .attr('xlink:href', d => {
-        const degree = 'lots';
+        const degree = iconScale(d.commonality);
         return `/assets/icon-common-${degree}.svg`;
       })
       .attr('x', WIDTH / 2 + 100 - 30)
@@ -112,4 +113,15 @@ function makeBars(data) {
 
 export function toggleAod() {
   console.log('toggleAod');
+}
+
+function iconScale(data) {
+  switch(data) {
+  case 1:
+    return 'lots';
+  case 2:
+    return 'some';
+  default:
+    return 'none';
+  }
 }

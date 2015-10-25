@@ -73,14 +73,15 @@ function group(parent, data) {
   // User Icon
   groupInner.append('image').attr('xlink:href', '/assets/gender-female.svg').attr('x', WIDTH / 2 - 50).attr('y', -20).attr('width', 100).attr('height', 100);
 
-  // Conflict, Commonality Icons
+  // Conflict Icon
   groupInner.append('image').attr('xlink:href', function (d) {
-    var degree = 'lots';
+    var degree = iconScale(d.conflict);
     return '/assets/icon-conflict-' + degree + '.svg';
   }).attr('x', WIDTH / 2 - 100).attr('y', 15).attr('width', 30).attr('height', 30);
 
+  // Commonality Icon
   groupInner.append('image').attr('xlink:href', function (d) {
-    var degree = 'lots';
+    var degree = iconScale(d.commonality);
     return '/assets/icon-common-' + degree + '.svg';
   }).attr('x', WIDTH / 2 + 100 - 30).attr('y', 15).attr('width', 30).attr('height', 30);
 
@@ -132,6 +133,17 @@ function makeBars(data) {
 
 function toggleAod() {
   console.log('toggleAod');
+}
+
+function iconScale(data) {
+  switch (data) {
+    case 1:
+      return 'lots';
+    case 2:
+      return 'some';
+    default:
+      return 'none';
+  }
 }
 
 },{"lodash":5}],3:[function(require,module,exports){

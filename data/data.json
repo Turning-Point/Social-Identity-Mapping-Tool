@@ -16,9 +16,9 @@
       "freqGroupProblemBehaviour": 3,
       "freqClientProblemBehaviour": 3,
 
-      "conflict": null,
+      "conflict": 1,
+      "commonality": 2,
       "compatibility": null,
-      "commonality": null,
 
       "tags": [
         "fighting",
@@ -52,9 +52,9 @@
       "freqGroupProblemBehaviour": 3,
       "freqClientProblemBehaviour": 3,
 
-      "conflict": null,
-      "compatibility": null,
+      "conflict": 2,
       "commonality": null,
+      "compatibility": null,
 
       "tags": [
         "outdoors"
