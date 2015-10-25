@@ -47,12 +47,14 @@ exports.toggleAod = toggleAod;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _lodash = require('lodash');
+var _groupBarComponent = require('./groupBarComponent');
 
-var _lodash2 = _interopRequireDefault(_lodash);
+var _groupBarComponent2 = _interopRequireDefault(_groupBarComponent);
 
-var WIDTH = 400;
-var HEIGHT = 300;
+var config = {
+  WIDTH: 400,
+  HEIGHT: 300
+};
 
 function group(parent, data) {
 
@@ -75,74 +77,36 @@ function group(parent, data) {
   // enter
   var addedGroups = groupInner.enter().append('g').attr('class', 'group').style('filter', "url(#drop-shadow)").attr('transform', function (d, i) {
     // console.log('groupInner', d);
-    var yOffset = i * (HEIGHT + 20);
+    var yOffset = i * (config.HEIGHT + 20);
     d.x = 0;
     d.y = yOffset;
     return 'translate(' + d.x + ',' + d.y + ')';
   }).call(drag);
 
   // Card BG
-  addedGroups.append('rect').attr('class', 'group__background').attr('width', WIDTH).attr('height', HEIGHT);
+  addedGroups.append('rect').attr('class', 'group__background').attr('width', config.WIDTH).attr('height', config.HEIGHT);
 
   // Card Title
-  addedGroups.append('text').attr('x', WIDTH / 2).attr('y', 130).attr('width', WIDTH).attr('class', 'group__name').text(function (d) {
+  addedGroups.append('text').attr('x', config.WIDTH / 2).attr('y', 130).attr('width', config.WIDTH).attr('class', 'group__name').text(function (d) {
     return d.name;
   });
 
   // User Icon
-  addedGroups.append('image').attr('xlink:href', '/assets/gender-female.svg').attr('x', WIDTH / 2 - 50).attr('y', -20).attr('width', 100).attr('height', 100);
+  addedGroups.append('image').attr('xlink:href', '/assets/gender-female.svg').attr('x', config.WIDTH / 2 - 50).attr('y', -20).attr('width', 100).attr('height', 100);
 
   // Conflict Icon
   addedGroups.append('image').attr('xlink:href', function (d) {
     var degree = iconScale(d.conflict);
     return '/assets/icon-conflict-' + degree + '.svg';
-  }).attr('x', WIDTH / 2 - 100).attr('y', 15).attr('width', 30).attr('height', 30);
+  }).attr('x', config.WIDTH / 2 - 100).attr('y', 15).attr('width', 30).attr('height', 30);
 
   // Commonality Icon
   addedGroups.append('image').attr('xlink:href', function (d) {
     var degree = iconScale(d.commonality);
     return '/assets/icon-common-' + degree + '.svg';
-  }).attr('x', WIDTH / 2 + 100 - 30).attr('y', 15).attr('width', 30).attr('height', 30);
+  }).attr('x', config.WIDTH / 2 + 100 - 30).attr('y', 15).attr('width', 30).attr('height', 30);
 
-  groupInner.call(barComponent);
-}
-
-function barComponent(parent) {
-  var barGroup = parent.select('.group__bars');
-
-  if (barGroup.empty()) {
-    barGroup = parent.append('g').attr('class', 'group__bars').attr('transform', 'translate(' + 0 + ', ' + (HEIGHT - 50) + ')');
-  }
-
-  var bar = barGroup.selectAll('.group__bar').data(function (d) {
-    var xOffset = 0;
-
-    var behaviours = d.behaviours[d.pdoc];
-
-    var total = _lodash2['default'].sum(behaviours, function (group) {
-      return group.level;
-    });
-
-    _lodash2['default'].each(behaviours, function (segment) {
-      var prevOffset = xOffset;
-      xOffset = xOffset + segment.level / total * WIDTH;
-      segment.offset = prevOffset;
-      segment.width = segment.level / total * WIDTH;
-    });
-    return behaviours;
-  });
-
-  // enter
-  bar.enter().append('rect');
-
-  // update
-  bar.attr('class', function (d, i) {
-    return 'group__bar palette-' + (i + 1);
-  }).attr('y', 0).attr('height', 50).transition().duration(500).attr('x', function (d) {
-    return d.offset;
-  }).attr('width', function (d) {
-    return d.width;
-  });
+  groupInner.call(_groupBarComponent2['default'], config);
 }
 
 function toggleAod(update_function, data) {
@@ -168,7 +132,62 @@ function iconScale(data) {
   }
 }
 
-},{"lodash":5}],3:[function(require,module,exports){
+},{"./groupBarComponent":3}],3:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports['default'] = barComponent;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+function barComponent(parent, config) {
+  console.log('barComponent', parent);
+  var barGroup = parent.select('.group__bars');
+
+  if (barGroup.empty()) {
+    barGroup = parent.append('g').attr('class', 'group__bars').attr('transform', 'translate(' + 0 + ', ' + (config.HEIGHT - 50) + ')');
+  }
+
+  var bar = barGroup.selectAll('.group__bar').data(function (d) {
+    var xOffset = 0;
+
+    var behaviours = d.behaviours[d.pdoc];
+
+    var total = _lodash2['default'].sum(behaviours, function (group) {
+      return group.level;
+    });
+
+    _lodash2['default'].each(behaviours, function (segment) {
+      var prevOffset = xOffset;
+      xOffset = xOffset + segment.level / total * config.WIDTH;
+      segment.offset = prevOffset;
+      segment.width = segment.level / total * config.WIDTH;
+    });
+    return behaviours;
+  });
+
+  // enter
+  bar.enter().append('rect');
+
+  // update
+  bar.attr('class', function (d, i) {
+    return 'group__bar palette-' + (i + 1);
+  }).attr('y', 0).attr('height', 50).transition().duration(500).attr('x', function (d) {
+    return d.offset;
+  }).attr('width', function (d) {
+    return d.width;
+  });
+}
+
+module.exports = exports['default'];
+
+},{"lodash":6}],4:[function(require,module,exports){
 'use strict';
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -217,7 +236,7 @@ _d32['default'].json('./data/data.json', function (error, data) {
   _d32['default'].select('.toggle-aod').on('click', (0, _group.toggleAod)(updateGroups, data));
 });
 
-},{"./filters":1,"./group":2,"d3":4,"lodash":5}],4:[function(require,module,exports){
+},{"./filters":1,"./group":2,"d3":5,"lodash":6}],5:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.6"
@@ -9722,7 +9741,7 @@ _d32['default'].json('./data/data.json', function (error, data) {
   if (typeof define === "function" && define.amd) define(d3); else if (typeof module === "object" && module.exports) module.exports = d3;
   this.d3 = d3;
 }();
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -22078,7 +22097,7 @@ _d32['default'].json('./data/data.json', function (error, data) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}]},{},[3])
+},{}]},{},[4])
 
 
 //# sourceMappingURL=bundle.js.map

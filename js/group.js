@@ -1,8 +1,10 @@
 
-import _ from 'lodash';
+import barComponent from './groupBarComponent';
 
-const WIDTH = 400;
-const HEIGHT = 300;
+const config = {
+  WIDTH: 400,
+  HEIGHT: 300
+}
 
 export default function group(parent, data) {
 
@@ -32,7 +34,7 @@ export default function group(parent, data) {
       .style('filter', "url(#drop-shadow)")
       .attr('transform', function(d, i) {
         // console.log('groupInner', d);
-        const yOffset = i * (HEIGHT + 20);
+        const yOffset = i * (config.HEIGHT + 20);
         d.x = 0;
         d.y = yOffset;
         return 'translate(' + d.x + ',' + d.y  + ')';
@@ -43,21 +45,21 @@ export default function group(parent, data) {
   addedGroups
     .append('rect')
     .attr('class', 'group__background')
-    .attr('width', WIDTH)
-    .attr('height', HEIGHT);
+    .attr('width', config.WIDTH)
+    .attr('height', config.HEIGHT);
 
   // Card Title
   addedGroups.append('text')
-    .attr('x', WIDTH / 2)
+    .attr('x', config.WIDTH / 2)
     .attr('y', 130)
-    .attr('width', WIDTH)
+    .attr('width', config.WIDTH)
     .attr('class', 'group__name')
     .text(d => d.name);
 
   // User Icon
   addedGroups.append('image')
     .attr('xlink:href', '/assets/gender-female.svg')
-    .attr('x', WIDTH / 2 - 50)
+    .attr('x', config.WIDTH / 2 - 50)
     .attr('y', -20)
     .attr('width', 100)
     .attr('height', 100);
@@ -68,7 +70,7 @@ export default function group(parent, data) {
       const degree = iconScale(d.conflict);
       return `/assets/icon-conflict-${degree}.svg`;
     })
-    .attr('x', WIDTH / 2 - 100)
+    .attr('x', config.WIDTH / 2 - 100)
     .attr('y', 15)
     .attr('width', 30)
     .attr('height', 30);
@@ -79,57 +81,12 @@ export default function group(parent, data) {
       const degree = iconScale(d.commonality);
       return `/assets/icon-common-${degree}.svg`;
     })
-    .attr('x', WIDTH / 2 + 100 - 30)
+    .attr('x', config.WIDTH / 2 + 100 - 30)
     .attr('y', 15)
     .attr('width', 30)
     .attr('height', 30);
 
-  groupInner.call(barComponent);
-}
-
-
-function barComponent(parent) {
-  var barGroup = parent.select('.group__bars');
-
-  if(barGroup.empty()) {
-    barGroup = parent.append('g')
-      .attr('class', 'group__bars')
-      .attr('transform', `translate(${0}, ${HEIGHT - 50})`)
-  }
-
-  const bar = barGroup.selectAll('.group__bar')
-    .data( d => {
-      let xOffset = 0;
-
-      const behaviours = d.behaviours[d.pdoc]
-
-      const total = _.sum(behaviours, group => group.level);
-
-      _.each(behaviours, (segment) => {
-        const prevOffset = xOffset;
-        xOffset = xOffset + (segment.level / total) * WIDTH;
-        segment.offset = prevOffset;
-        segment.width = (segment.level / total) * WIDTH;
-      });
-      return behaviours;
-    });
-
-  // enter
-  bar
-    .enter()
-    .append('rect')
-
-  // update
-  bar
-    .attr('class', (d, i) => {
-      return 'group__bar palette-' + (i + 1);
-    })
-    .attr('y', 0)
-    .attr('height', 50)
-    .transition()
-    .duration(500)
-    .attr('x', d => d.offset)
-    .attr('width', d => d.width)
+  groupInner.call(barComponent, config);
 }
 
 export function toggleAod(update_function, data) {
