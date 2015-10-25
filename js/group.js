@@ -8,6 +8,13 @@ export default function group(parent, data) {
 
   console.info('groups', parent);
 
+  var drag = d3.behavior.drag()
+    .origin(d => d)
+    .on('drag', function(d) {
+      d.x = d3.event.x
+      d.y = d3.event.y
+      d3.select(this).attr('transform', 'translate(' + d.x + ',' + d.y + ')')
+    })
 
   const groupInner = parent.selectAll('.group')
     .data(data.groups);
@@ -18,8 +25,11 @@ export default function group(parent, data) {
     .attr('transform', function(d, i) {
       // console.log('groupInner', d);
       const yOffset = i * (HEIGHT + 20);
-      return 'translate(' + 0 + ',' + yOffset  + ')';
-    });
+      d.x = 0;
+      d.y = yOffset;
+      return 'translate(' + d.x + ',' + d.y  + ')';
+    })
+    .call(drag)
 
   groupInner.append('rect')
       .attr('class', 'group__background')
