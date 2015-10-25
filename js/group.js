@@ -85,16 +85,20 @@ export default function group(parent, data) {
   groupInner.call(barComponent, config);
 }
 
-export function toggleAod(update_function, data) {
+export function setToggleTitle(chbox, update_function, data) {
+  const label = document.getElementById('toggle-label');
+
   return function() {
     if(data.client.pdoc == 'alcohol') {
-      data.client.pdoc = 'other'
+      label.innerHTML = 'Drug Use';
+      data.client.pdoc = 'other';
     } else {
+      label.innerHTML = 'Alcohol Use';
       data.client.pdoc = 'alcohol'
     }
 
     update_function();
-  }
+  }();
 }
 
 function iconScale(data) {

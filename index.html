@@ -9,7 +9,7 @@
     <svg></svg>
     <div id="header">
     	<label class="tgl">
-			<input type="checkbox" checked onchange="setToggleTitle(this, 'toggle-label', ['Alchohol Use', 'Drug Use']);" />
+			<input type="checkbox" class="toggle-aod" checked />
 			<span class="tgl_body">
 				<span class="tgl_switch"></span>
 				<span class="tgl_track">
@@ -19,20 +19,12 @@
 			</span>
 			<span id="toggle-label" class="tgl-label">Alchohol Use</span>
 		</label>
+
         <h1 class="alpha">Social Identity Mapping Tool</h1>
-        <a class="toggle-aod">Toggle</a>
     </div>
     <div id="footer">
     	<img src="assets/panels-legend.svg" />
     </div>
 
     <script src="js/bundle.js"></script>
-	<script type="text/javascript">
-		function setToggleTitle(chbox, title_id, arr) {
-			var label = document.getElementById(title_id);
-			if(label) {
-				chbox.checked == true ? label.innerHTML = arr[0] : label.innerHTML = arr[1];
-			}
-		}
-	</script>
 </body>

@@ -2,7 +2,7 @@
 import d3 from 'd3';
 import _ from 'lodash';
 
-import groupComponent, { toggleAod } from './group';
+import groupComponent, { toggleAod, setToggleTitle } from './group';
 import drawLinks from './linkComponent';
 import filterDefs from './filters';
 
@@ -44,5 +44,8 @@ d3.json('./data/data.json', function (error, data) {
 
   links.call(drawLinks, data);
 
-  d3.select('.toggle-aod').on('click', toggleAod(updateGroups, data));
+  // d3.select('.toggle-aod').on('click', toggleAod(updateGroups, data));
+  d3.select('.toggle-aod').on('change', function() {
+    setToggleTitle(this, updateGroups, data);
+  });
 });

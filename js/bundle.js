@@ -43,7 +43,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 exports['default'] = group;
-exports.toggleAod = toggleAod;
+exports.setToggleTitle = setToggleTitle;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -107,16 +107,20 @@ function group(parent, data) {
   groupInner.call(_groupBarComponent2['default'], config);
 }
 
-function toggleAod(update_function, data) {
-  return function () {
+function setToggleTitle(chbox, update_function, data) {
+  var label = document.getElementById('toggle-label');
+
+  return (function () {
     if (data.client.pdoc == 'alcohol') {
+      label.innerHTML = 'Drug Use';
       data.client.pdoc = 'other';
     } else {
+      label.innerHTML = 'Alcohol Use';
       data.client.pdoc = 'alcohol';
     }
 
     update_function();
-  };
+  })();
 }
 
 function iconScale(data) {
@@ -239,7 +243,10 @@ _d32['default'].json('./data/data.json', function (error, data) {
 
   links.call(_linkComponent2['default'], data);
 
-  _d32['default'].select('.toggle-aod').on('click', (0, _group.toggleAod)(updateGroups, data));
+  // d3.select('.toggle-aod').on('click', toggleAod(updateGroups, data));
+  _d32['default'].select('.toggle-aod').on('change', function () {
+    (0, _group.setToggleTitle)(this, updateGroups, data);
+  });
 });
 
 },{"./filters":1,"./group":2,"./linkComponent":5,"d3":6,"lodash":7}],5:[function(require,module,exports){
