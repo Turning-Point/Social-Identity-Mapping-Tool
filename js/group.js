@@ -15,6 +15,7 @@ export default function group(parent, data) {
   groupInner.enter().append('g')
     .attr('class', 'group')
     .attr('transform', function(d, i) {
+      // console.log('groupInner', d);
       const yOffset = i * (HEIGHT + 20);
       return 'translate(' + 0 + ',' + yOffset  + ')';
     });
@@ -35,30 +36,23 @@ function barComponent(parent) {
 
   const bar = barGroup.selectAll('.group__bar')
     .data( d => {
-      console.log(d.behaviours.alcohol);
-      return d.behaviours.alcohol;
-    })
+      let xOffset = 0;
 
-    // parent.data().behaviours.alcohol.forEach(level => {
-    //   console.log('level', level);
-    //   level.values.forEach(function(item){
-    //     totals[item.x] = (totals[item.x] || 0 ) + item.y
-    //   });
-    // });
+      _.each(d.behaviours.alcohol, (segment) => {
+        const prevOffset = xOffset;
+        xOffset = xOffset + segment.level * 20;
+        segment.offset = prevOffset;
+        console.log('segment', segment);
+      });
+      return d.behaviours.alcohol;
+    });
 
   // enter
   bar.enter().append('rect')
     .attr('class', 'group__bar');
-    // .call(makeBars);
-
-  let xOffset = 0;
 
   // update
-  bar.attr('x', (d, i) => {
-    const prevOffset = xOffset;
-    xOffset = xOffset + d.level * 20;
-    return prevOffset;
-  })
+  bar.attr('x', d => d.offset)
     .attr('y', 0)
     .attr('width', d => d.level * 20)
     .attr('height', 30)
