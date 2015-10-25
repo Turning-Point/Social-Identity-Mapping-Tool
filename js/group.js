@@ -8,6 +8,10 @@ export default function group(parent, data) {
 
   console.info('groups', parent);
 
+  data.groups.forEach(group => {
+    group.pdoc = data.client.pdoc
+  })
+
   var drag = d3.behavior.drag()
     .origin(d => d)
     .on('drag', function(d) {
@@ -20,72 +24,91 @@ export default function group(parent, data) {
     .data(data.groups);
 
   // enter
-  groupInner.enter().append('g')
-    .attr('class', 'group')
-    .attr('transform', function(d, i) {
-      // console.log('groupInner', d);
-      const yOffset = i * (HEIGHT + 20);
-      d.x = 0;
-      d.y = yOffset;
-      return 'translate(' + d.x + ',' + d.y  + ')';
-    })
-    .call(drag)
+  let addedGroups = 
+    groupInner
+      .enter()
+      .append('g')
+      .attr('class', 'group')
+      .attr('transform', function(d, i) {
+        // console.log('groupInner', d);
+        const yOffset = i * (HEIGHT + 20);
+        d.x = 0;
+        d.y = yOffset;
+        return 'translate(' + d.x + ',' + d.y  + ')';
+      })
+      .call(drag)
 
-  groupInner.append('rect')
-      .attr('class', 'group__background')
-      .attr('width', WIDTH)
-      .attr('height', HEIGHT);
+  addedGroups
+    .append('rect')
+    .attr('class', 'group__background')
+    .attr('width', WIDTH)
+    .attr('height', HEIGHT);
 
-  groupInner.append('text')
+  addedGroups
+    .append('text')
     .attr('x', WIDTH / 2)
     .attr('y', 30)
     .attr('width', WIDTH)
     .attr('class', 'group__name')
     .text(d => d.name);
 
+
   groupInner.call(barComponent);
 }
 
 
 function barComponent(parent) {
+  var barGroup = parent.select('.group__bars');
 
-  const barGroup = parent.append('g')
-    .attr('class', 'barGroup')
-    .attr('transform', `translate(${0}, ${HEIGHT - 50})`)
+  if(barGroup.empty()) {
+    barGroup = parent.append('g')
+      .attr('class', 'group__bars')
+      .attr('transform', `translate(${0}, ${HEIGHT - 50})`)
+  }
 
   const bar = barGroup.selectAll('.group__bar')
     .data( d => {
       let xOffset = 0;
 
-      const total = _.sum(d.behaviours.alcohol, group => group.level);
+      const behaviours = d.behaviours[d.pdoc]
 
-      _.each(d.behaviours.alcohol, (segment) => {
+      const total = _.sum(behaviours, group => group.level);
+
+      _.each(behaviours, (segment) => {
         const prevOffset = xOffset;
         xOffset = xOffset + (segment.level / total) * WIDTH;
         segment.offset = prevOffset;
         segment.width = (segment.level / total) * WIDTH;
       });
-      return d.behaviours.alcohol;
+      return behaviours;
     });
 
   // enter
-  bar.enter().append('rect')
-    .attr('class', 'group__bar');
+  bar
+    .enter()
+    .append('rect')
 
   // update
-  bar.attr('x', d => d.offset)
+  bar
     .attr('class', (d, i) => {
-      return 'palette-' + (i + 1);
+      return 'group__bar palette-' + (i + 1);
     })
     .attr('y', 0)
-    .attr('width', d => d.width)
     .attr('height', 50)
+    .transition()
+    .duration(500)
+    .attr('x', d => d.offset)
+    .attr('width', d => d.width)
 }
 
-function makeBars(data) {
-  console.log('makeBars', data);
-}
+export function toggleAod(update_function, data) {
+  return function() {
+    if(data.client.pdoc == 'alcohol') {
+      data.client.pdoc = 'other'
+    } else {
+      data.client.pdoc = 'alcohol'
+    }
 
-export function toggleAod() {
-  console.log('toggleAod');
+    update_function()
+  }
 }

@@ -27,7 +27,11 @@ d3.json('./data/data.json', function (error, data) {
     .attr('class', 'groups')
     .attr('transform', `translate(${padding}, 80)`);
 
-  groups.call(groupComponent, data);
+  var updateGroups = function() {
+    groups.call(groupComponent, data);    
+  }
 
-  d3.select('.toggle-aod').on('click', toggleAod);
+  updateGroups()
+
+  d3.select('.toggle-aod').on('click', toggleAod(updateGroups, data));
 });

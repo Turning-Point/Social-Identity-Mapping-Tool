@@ -27,16 +27,16 @@
 
       "behaviours": {
         "alcohol": [
-          { "name": "heavy",    "level": 3 },
-          { "name": "moderate", "level": 3 },
+          { "name": "heavy",    "level": 1 },
+          { "name": "moderate", "level": 2 },
           { "name": "light",    "level": 3 },
-          { "name": "abstain",  "level": 3 }
+          { "name": "abstain",  "level": 4 }
         ],
         "other": [
-          { "name": "heavy",    "level": 3 },
+          { "name": "heavy",    "level": 4 },
           { "name": "moderate", "level": 3 },
-          { "name": "light",    "level": 3 },
-          { "name": "abstain",  "level": 3 }
+          { "name": "light",    "level": 2 },
+          { "name": "abstain",  "level": 1 }
         ]
       }
     },
@@ -62,16 +62,16 @@
 
       "behaviours": {
         "alcohol": [
-          { "name": "heavy",    "level": 4 },
-          { "name": "moderate", "level": 4 },
+          { "name": "heavy",    "level": 2 },
+          { "name": "moderate", "level": 2 },
           { "name": "light",    "level": 4 },
-          { "name": "abstain",  "level": 4 }
+          { "name": "abstain",  "level": 1 }
         ],
         "other": [
           { "name": "heavy",    "level": 4 },
           { "name": "moderate", "level": 4 },
-          { "name": "light",    "level": 4 },
-          { "name": "abstain",  "level": 4 }
+          { "name": "light",    "level": 1 },
+          { "name": "abstain",  "level": 3 }
         ]
       }
     }
