@@ -107,3 +107,10 @@ h1, h2, h3, h4 {
     stroke: $red;
     stroke-width: 10px;
 }
+
+#footer {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    text-align:center;
+}
