@@ -21,6 +21,8 @@ $common-high:   $blue-dark;
 $common-some:   $blue-light;
 $common-none:   $grey;
 
+@import './_toggle.scss';
+
 * {
     box-sizing: border-box;
 }
