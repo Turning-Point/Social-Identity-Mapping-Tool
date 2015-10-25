@@ -3,6 +3,7 @@ import d3 from 'd3';
 import _ from 'lodash';
 
 import groupComponent, { toggleAod } from './group';
+import drawLinks from './linkComponent';
 import filterDefs from './filters';
 
 d3.json('./data/data.json', function (error, data) {
@@ -32,10 +33,16 @@ d3.json('./data/data.json', function (error, data) {
     .attr('transform', `translate(${padding}, 80)`);
 
   var updateGroups = function() {
-    groups.call(groupComponent, data);    
+    groups.call(groupComponent, data);
   }
 
-  updateGroups()
+  updateGroups();
+
+  const links = svg.append('g')
+    .attr('class', 'links')
+    .attr('transform', `translate(${padding}, 80)`);
+
+  links.call(drawLinks, data);
 
   d3.select('.toggle-aod').on('click', toggleAod(updateGroups, data));
 });

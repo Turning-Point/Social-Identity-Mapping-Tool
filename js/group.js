@@ -12,7 +12,7 @@ export default function group(parent, data) {
 
   data.groups.forEach(group => {
     group.pdoc = data.client.pdoc
-  })
+  });
 
   var drag = d3.behavior.drag()
     .origin(d => d)
@@ -20,7 +20,7 @@ export default function group(parent, data) {
       d.x = d3.event.x
       d.y = d3.event.y
       d3.select(this).attr('transform', 'translate(' + d.x + ',' + d.y + ')')
-    })
+    });
 
   const groupInner = parent.selectAll('.group')
     .data(data.groups);
@@ -93,7 +93,7 @@ export function toggleAod(update_function, data) {
       data.client.pdoc = 'alcohol'
     }
 
-    update_function()
+    update_function();
   }
 }
 

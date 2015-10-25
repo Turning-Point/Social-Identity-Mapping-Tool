@@ -159,9 +159,20 @@
     {
       "source": 0,
       "target": 1,
-      "conflict": null,
-      "compatibility": null,
+      "conflict": 2,
       "commonality": null
+    },
+    {
+      "source": 1,
+      "target": 3,
+      "conflict": 2,
+      "commonality": null
+    },
+    {
+      "source": 2,
+      "target": 3,
+      "conflict": null,
+      "commonality": 2
     }
   ]
 }

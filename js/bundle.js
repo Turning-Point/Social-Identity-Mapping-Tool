@@ -183,7 +183,7 @@ function barComponent(parent, config) {
 
 module.exports = exports['default'];
 
-},{"lodash":6}],4:[function(require,module,exports){
+},{"lodash":7}],4:[function(require,module,exports){
 'use strict';
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -199,6 +199,10 @@ var _lodash2 = _interopRequireDefault(_lodash);
 var _group = require('./group');
 
 var _group2 = _interopRequireDefault(_group);
+
+var _linkComponent = require('./linkComponent');
+
+var _linkComponent2 = _interopRequireDefault(_linkComponent);
 
 var _filters = require('./filters');
 
@@ -229,10 +233,49 @@ _d32['default'].json('./data/data.json', function (error, data) {
 
   updateGroups();
 
+  var links = svg.append('g').attr('class', 'links').attr('transform', 'translate(' + padding + ', 80)');
+
+  links.call(_linkComponent2['default'], data);
+
   _d32['default'].select('.toggle-aod').on('click', (0, _group.toggleAod)(updateGroups, data));
 });
 
-},{"./filters":1,"./group":2,"d3":5,"lodash":6}],5:[function(require,module,exports){
+},{"./filters":1,"./group":2,"./linkComponent":5,"d3":6,"lodash":7}],5:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports['default'] = drawLink;
+
+var lineWidth = 10;
+
+function drawLink(parent, data) {
+
+  var linkContainers = parent.selectAll('.link').data(data.links);
+
+  var newLink = linkContainers.enter().append('g').attr('class', 'link');
+
+  linkContainers.call(link, data);
+}
+
+function link(parent, data) {
+  console.log('link: parent', parent);
+
+  // get the source location
+  // get the target location
+  // const source = data[parent]
+
+  // var linkPath = "M" + data.coordinates[0];
+  // data.coordinates.slice(1).forEach(function(knot) {
+  //   linkPath += " L" + knot;
+  // });
+  // // console.log('drawSimpleEdge', linkPath);
+  // return linkPath;
+}
+module.exports = exports['default'];
+
+},{}],6:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.6"
@@ -9737,7 +9780,7 @@ _d32['default'].json('./data/data.json', function (error, data) {
   if (typeof define === "function" && define.amd) define(d3); else if (typeof module === "object" && module.exports) module.exports = d3;
   this.d3 = d3;
 }();
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function (global){
 /**
  * @license
