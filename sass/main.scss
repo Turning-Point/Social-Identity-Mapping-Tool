@@ -56,6 +56,8 @@ h1, h2, h3, h4 {
 
 .group__name {
     @extend .beta;
+    fill: $blue-dark;
+    text-anchor: middle;
 }
 
 #header {

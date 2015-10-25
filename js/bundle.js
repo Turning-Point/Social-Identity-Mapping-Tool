@@ -31,12 +31,16 @@ function group(parent, data) {
 
   groupInner.append('rect').attr('class', 'group__background').attr('width', WIDTH).attr('height', HEIGHT);
 
+  groupInner.append('text').attr('x', WIDTH / 2).attr('y', 30).attr('width', WIDTH).attr('class', 'group__name').text(function (d) {
+    return d.name;
+  });
+
   groupInner.call(barComponent);
 }
 
 function barComponent(parent) {
 
-  var barGroup = parent.append('g').attr('class', 'barGroup');
+  var barGroup = parent.append('g').attr('class', 'barGroup').attr('transform', 'translate(' + 0 + ', ' + (HEIGHT - 50) + ')');
 
   var bar = barGroup.selectAll('.group__bar').data(function (d) {
     var xOffset = 0;
@@ -64,7 +68,7 @@ function barComponent(parent) {
     return 'palette-' + (i + 1);
   }).attr('y', 0).attr('width', function (d) {
     return d.width;
-  }).attr('height', 30);
+  }).attr('height', 50);
 }
 
 function makeBars(data) {

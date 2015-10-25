@@ -21,12 +21,17 @@ export default function group(parent, data) {
       return 'translate(' + 0 + ',' + yOffset  + ')';
     });
 
-
-
   groupInner.append('rect')
       .attr('class', 'group__background')
       .attr('width', WIDTH)
       .attr('height', HEIGHT);
+
+  groupInner.append('text')
+    .attr('x', WIDTH / 2)
+    .attr('y', 30)
+    .attr('width', WIDTH)
+    .attr('class', 'group__name')
+    .text(d => d.name);
 
   groupInner.call(barComponent);
 }
@@ -35,7 +40,8 @@ export default function group(parent, data) {
 function barComponent(parent) {
 
   const barGroup = parent.append('g')
-    .attr('class', 'barGroup');
+    .attr('class', 'barGroup')
+    .attr('transform', `translate(${0}, ${HEIGHT - 50})`)
 
   const bar = barGroup.selectAll('.group__bar')
     .data( d => {
@@ -63,7 +69,7 @@ function barComponent(parent) {
     })
     .attr('y', 0)
     .attr('width', d => d.width)
-    .attr('height', 30)
+    .attr('height', 50)
 }
 
 function makeBars(data) {
