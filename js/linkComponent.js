@@ -10,21 +10,26 @@ export default function drawLink(parent, data) {
     .enter().append('g')
     .attr('class', 'link');
 
-  linkContainers.call(link, data);
+  newLink.each((d) => {
+    link(linkContainers, d, data);
+  });
 }
 
 
-function link(parent, data) {
-  console.log('link: parent', parent);
+function link(parent, d, data) {
+  console.log('link: parent', parent, parent.node().__data__);
 
   // get the source location
   // get the target location
-  // const source = data[parent]
+  const source = [ data.groups[d.source].x, data.groups[d.source].y ];
+  const target = [ data.groups[d.target].x, data.groups[d.target].y ];
 
-  // var linkPath = "M" + data.coordinates[0];
+  console.log('source, target', source, target);
+  var linkPath = "M" + source + "L" + target;
   // data.coordinates.slice(1).forEach(function(knot) {
   //   linkPath += " L" + knot;
   // });
-  // // console.log('drawSimpleEdge', linkPath);
-  // return linkPath;
+  // console.log('drawSimpleEdge', linkPath);
+  parent.append('path')
+    .attr('d', linkPath);
 }

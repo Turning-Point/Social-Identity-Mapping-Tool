@@ -100,3 +100,8 @@ h1, h2, h3, h4 {
     padding: 6px;
     border-radius: 5px;
 }
+
+.link path {
+    stroke: $red;
+    stroke-width: 10px;
+}
