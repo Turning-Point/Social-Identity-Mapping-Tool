@@ -1,0 +1,178 @@
+{
+  "client": {
+    "pdoc": "alcohol"
+  },
+
+  "groups": [
+    {
+      "id": 0,
+      "name": "Footy Club",
+      "pax": 6,
+      "identification": 6,
+      "x": 80,
+      "y": 40,
+
+      "supportForProblemBehaviour": 3,
+      "supportForRecoveryBehaviour": 3,
+
+      "freqGroupProblemBehaviour": 3,
+      "freqClientProblemBehaviour": 3,
+
+      "conflict": 1,
+      "commonality": 2,
+      "compatibility": null,
+
+      "tags": [
+        "fighting",
+        "high expectations"
+      ],
+
+      "behaviours": {
+        "alcohol": [
+          { "name": "heavy",    "level": 1 },
+          { "name": "moderate", "level": 2 },
+          { "name": "light",    "level": 3 },
+          { "name": "abstain",  "level": 4 }
+        ],
+        "other": [
+          { "name": "heavy",    "level": 4 },
+          { "name": "moderate", "level": 3 },
+          { "name": "light",    "level": 2 },
+          { "name": "abstain",  "level": 1 }
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "name": "Drinking Mates",
+      "pax": 12,
+      "identification": 3,
+      "x": 560,
+      "y": 40,
+
+      "supportForProblemBehaviour": 3,
+      "supportForRecoveryBehaviour": 3,
+
+      "freqGroupProblemBehaviour": 3,
+      "freqClientProblemBehaviour": 3,
+
+      "conflict": 2,
+      "commonality": null,
+      "compatibility": null,
+
+      "tags": [
+        "outdoors"
+      ],
+
+      "behaviours": {
+        "alcohol": [
+          { "name": "heavy",    "level": 2 },
+          { "name": "moderate", "level": 2 },
+          { "name": "light",    "level": 4 },
+          { "name": "abstain",  "level": 1 }
+        ],
+        "other": [
+          { "name": "heavy",    "level": 4 },
+          { "name": "moderate", "level": 4 },
+          { "name": "light",    "level": 1 },
+          { "name": "abstain",  "level": 3 }
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "name": "Music Community",
+      "pax": 12,
+      "identification": 3,
+      "x": 80,
+      "y": 340,
+
+      "supportForProblemBehaviour": 3,
+      "supportForRecoveryBehaviour": 3,
+
+      "freqGroupProblemBehaviour": 3,
+      "freqClientProblemBehaviour": 3,
+
+      "conflict": 2,
+      "commonality": null,
+      "compatibility": null,
+
+      "tags": [
+        "outdoors"
+      ],
+
+      "behaviours": {
+        "alcohol": [
+          { "name": "heavy",    "level": 2 },
+          { "name": "moderate", "level": 2 },
+          { "name": "light",    "level": 4 },
+          { "name": "abstain",  "level": 1 }
+        ],
+        "other": [
+          { "name": "heavy",    "level": 4 },
+          { "name": "moderate", "level": 4 },
+          { "name": "light",    "level": 1 },
+          { "name": "abstain",  "level": 3 }
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "name": "Best Friends",
+      "pax": 12,
+      "identification": 3,
+      "x": 560,
+      "y": 340,
+
+      "supportForProblemBehaviour": 3,
+      "supportForRecoveryBehaviour": 3,
+
+      "freqGroupProblemBehaviour": 3,
+      "freqClientProblemBehaviour": 3,
+
+      "conflict": 2,
+      "commonality": null,
+      "compatibility": null,
+
+      "tags": [
+        "outdoors"
+      ],
+
+      "behaviours": {
+        "alcohol": [
+          { "name": "heavy",    "level": 2 },
+          { "name": "moderate", "level": 2 },
+          { "name": "light",    "level": 4 },
+          { "name": "abstain",  "level": 1 }
+        ],
+        "other": [
+          { "name": "heavy",    "level": 4 },
+          { "name": "moderate", "level": 4 },
+          { "name": "light",    "level": 1 },
+          { "name": "abstain",  "level": 3 }
+        ]
+      }
+    }
+  ],
+
+  "links": [
+    {
+      "source": 0,
+      "target": 1,
+      "conflict": 2,
+      "commonality": null
+    },
+    {
+      "source": 1,
+      "target": 3,
+      "conflict": 2,
+      "commonality": null
+    },
+    {
+      "source": 2,
+      "target": 3,
+      "conflict": null,
+      "commonality": 2
+    }
+  ]
+}
