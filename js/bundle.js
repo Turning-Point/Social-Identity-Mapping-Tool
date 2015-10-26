@@ -90,18 +90,18 @@ function group(parent, data) {
   });
 
   // User Icon
-  addedGroups.append('image').attr('xlink:href', '../assets/gender-female.svg').attr('x', config.WIDTH / 2 - 50).attr('y', -20).attr('width', 100).attr('height', 100);
+  addedGroups.append('image').attr('xlink:href', 'assets/gender-female.svg').attr('x', config.WIDTH / 2 - 50).attr('y', -20).attr('width', 100).attr('height', 100);
 
   // Conflict Icon
   addedGroups.append('image').attr('xlink:href', function (d) {
     var degree = iconScale(d.conflict);
-    return '../assets/icon-conflict-' + degree + '.svg';
+    return 'assets/icon-conflict-' + degree + '.svg';
   }).attr('x', config.WIDTH / 2 - 100).attr('y', 15).attr('width', 30).attr('height', 30);
 
   // Commonality Icon
   addedGroups.append('image').attr('xlink:href', function (d) {
     var degree = iconScale(d.commonality);
-    return '../assets/icon-common-' + degree + '.svg';
+    return 'assets/icon-common-' + degree + '.svg';
   }).attr('x', config.WIDTH / 2 + 100 - 30).attr('y', 15).attr('width', 30).attr('height', 30);
 
   groupInner.call(_groupBarComponent2['default'], config);
