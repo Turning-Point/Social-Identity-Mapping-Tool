@@ -54,7 +54,7 @@ export default function group(parent, data) {
 
   // User Icon
   addedGroups.append('image')
-    .attr('xlink:href', '/assets/gender-female.svg')
+    .attr('xlink:href', '../assets/gender-female.svg')
     .attr('x', config.WIDTH / 2 - 50)
     .attr('y', -20)
     .attr('width', 100)
@@ -64,7 +64,7 @@ export default function group(parent, data) {
   addedGroups.append('image')
     .attr('xlink:href', d => {
       const degree = iconScale(d.conflict);
-      return `/assets/icon-conflict-${degree}.svg`;
+      return `../assets/icon-conflict-${degree}.svg`;
     })
     .attr('x', config.WIDTH / 2 - 100)
     .attr('y', 15)
@@ -75,7 +75,7 @@ export default function group(parent, data) {
   addedGroups.append('image')
     .attr('xlink:href', d => {
       const degree = iconScale(d.commonality);
-      return `/assets/icon-common-${degree}.svg`;
+      return `../assets/icon-common-${degree}.svg`;
     })
     .attr('x', config.WIDTH / 2 + 100 - 30)
     .attr('y', 15)
