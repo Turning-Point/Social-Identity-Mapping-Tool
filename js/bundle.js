@@ -554,6 +554,12 @@ Object.defineProperty(exports, '__esModule', {
 });
 exports['default'] = drawLink;
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _d3 = require('d3');
+
+var _d32 = _interopRequireDefault(_d3);
+
 var _group = require('./group');
 
 var lineWidth = 10;
@@ -566,8 +572,9 @@ function drawLink(parent, data) {
   linkContainers.enter().append('g').attr('class', 'link').append('path');
 
   // update
-  linkContainers.each(function (d) {
-    setLinkPath(linkContainers, d, data);
+  linkContainers.each(function (links) {
+    console.log('links', this, links);
+    setLinkPath(this, links, data);
   });
 
   // exit
@@ -617,14 +624,11 @@ function setLinkPath(parent, d, data) {
   // console.log('source, target', source, target);
   var linkPath = "M" + [sourceOffset.x, sourceOffset.y] + "L" + [targetOffset.x, targetOffset.y];
 
-  parent.each(function (el) {
-    // console.log('el', el);
-    d3.select(this).select('path').attr('d', linkPath);
-  });
+  _d32['default'].select(parent).select('path').attr('d', linkPath);
 }
 module.exports = exports['default'];
 
-},{"./group":3}],7:[function(require,module,exports){
+},{"./group":3,"d3":8}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {

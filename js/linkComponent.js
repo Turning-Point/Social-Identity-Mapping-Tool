@@ -1,4 +1,5 @@
 
+import d3 from 'd3';
 const lineWidth = 10;
 import { config } from './group';
 
@@ -14,8 +15,9 @@ export default function drawLink(parent, data) {
     .append('path');
 
   // update
-  linkContainers.each((d) => {
-    setLinkPath(linkContainers, d, data);
+  linkContainers.each(function(links) {
+    console.log('links', this, links);
+    setLinkPath(this, links, data);
   });
 
   // exit
@@ -73,8 +75,5 @@ function setLinkPath(parent, d, data) {
     "M" + [sourceOffset.x, sourceOffset.y] +
     "L" + [targetOffset.x, targetOffset.y];
 
-  parent.each(function(el) {
-    // console.log('el', el);
-    d3.select(this).select('path').attr('d', linkPath);
-  });
+  d3.select(parent).select('path').attr('d', linkPath);
 }
