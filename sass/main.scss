@@ -22,6 +22,7 @@ $common-some:   $blue-light;
 $common-none:   $grey;
 
 @import './_toggle.scss';
+@import './_file-saver.scss';
 
 * {
     box-sizing: border-box;

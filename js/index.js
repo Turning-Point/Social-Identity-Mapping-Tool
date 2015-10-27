@@ -5,6 +5,7 @@ import _ from 'lodash';
 import groupComponent, { toggleAod, setToggleTitle } from './group';
 import drawLinks from './linkComponent';
 import filterDefs from './filters';
+import { saveFile, loadFile, fileUpload, deleteMap} from './persistMap'
 
 d3.json('./data/data.json', function (error, data) {
   if (error) throw error;
@@ -48,4 +49,18 @@ d3.json('./data/data.json', function (error, data) {
   d3.select('.toggle-aod').on('change', function() {
     setToggleTitle(this, updateGroups, data);
   });
+
+  // ============================================================
+  // File Saving
+  // ============================================================
+
+  d3.select('#download-input').on('click', () => { saveFile(data); });
+  d3.select('#upload-input').on('click', loadFile);
+  d3.select('#hidden-file-upload').on('change', fileUpload);
+  d3.select('#delete-graph').on('click', deleteMap);
+
+  // warn the user when leaving
+  // window.onbeforeunload = function() {
+  //   return 'Ensure you save your map before closing or refreshing this page!';
+  // };
 });
