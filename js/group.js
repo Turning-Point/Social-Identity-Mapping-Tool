@@ -1,5 +1,6 @@
 
 import barComponent from './groupBarComponent';
+import { renderLinks } from './index';
 
 export const config = {
   WIDTH: 300,
@@ -20,6 +21,7 @@ export default function group(parent, data) {
       d.x = d3.event.x
       d.y = d3.event.y
       d3.select(this).attr('transform', 'translate(' + d.x + ',' + d.y + ')')
+      renderLinks();
     });
 
   const groupInner = parent.selectAll('.group')
@@ -85,7 +87,7 @@ export default function group(parent, data) {
   groupInner.call(barComponent, config);
 }
 
-export function setToggleTitle(chbox, update_function, data) {
+export function setToggleTitle(updateFunction, data) {
   const label = document.getElementById('toggle-label');
 
   return function() {
@@ -96,8 +98,7 @@ export function setToggleTitle(chbox, update_function, data) {
       label.innerHTML = 'Alcohol Use';
       data.client.pdoc = 'alcohol'
     }
-
-    update_function();
+    updateFunction();
   }();
 }
 
