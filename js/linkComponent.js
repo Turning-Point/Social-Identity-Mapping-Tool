@@ -7,18 +7,24 @@ export default function drawLink(parent, data) {
   const linkContainers = parent.selectAll('.link')
     .data(data.links);
 
-  const newLink = linkContainers
-    .enter().append('g')
-    .attr('class', 'link');
+  // enter
+  linkContainers.enter()
+    .append('g')
+    .attr('class', 'link')
+    .append('path');
 
-  newLink.each((d) => {
-    link(linkContainers, d, data);
+  // update
+  linkContainers.each((d) => {
+    setLinkPath(linkContainers, d, data);
   });
+
+  // exit
+  linkContainers.exit().remove();
 }
 
 
-function link(parent, d, data) {
-  console.log('link: parent', parent, parent.node().__data__);
+function setLinkPath(parent, d, data) {
+  // console.log('link: parent', parent, parent.node().__data__);
 
   // get the source location
   // get the target location
@@ -62,13 +68,13 @@ function link(parent, d, data) {
 
   }
 
+  // console.log('source, target', source, target);
+  var linkPath =
+    "M" + [sourceOffset.x, sourceOffset.y] +
+    "L" + [targetOffset.x, targetOffset.y];
 
-  console.log('source, target', source, target);
-  var linkPath = "M" + [sourceOffset.x, sourceOffset.y] + "L" + [targetOffset.x, targetOffset.y];
-  // data.coordinates.slice(1).forEach(function(knot) {
-  //   linkPath += " L" + knot;
-  // });
-  // console.log('drawSimpleEdge', linkPath);
-  parent.append('path')
-    .attr('d', linkPath);
+  parent.each(function(el) {
+    // console.log('el', el);
+    d3.select(this).select('path').attr('d', linkPath);
+  });
 }

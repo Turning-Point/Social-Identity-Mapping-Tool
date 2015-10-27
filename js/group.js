@@ -85,6 +85,8 @@ export default function group(parent, data) {
     .attr('height', 30);
 
   groupInner.call(barComponent, config);
+
+  groupInner.exit().remove();
 }
 
 export function setToggleTitle(updateFunction, data) {

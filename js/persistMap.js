@@ -52,6 +52,14 @@ export function fileUpload(input) {
 }
 
 export function deleteMap(data) {
-  d3.select('#social-identity-map').selectAll('*').remove();
-  window.data = {};
+  const initialState = {
+    "client": {
+      "pdoc": null
+    },
+    "groups": [],
+    "links": []
+  };
+  window.data = initialState;
+  renderGroups();
+  renderLinks();
 }
