@@ -6,7 +6,8 @@
     <link href='https://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
 </head>
 <body>
-    <svg></svg>
+    <svg id="social-identity-map"></svg>
+
     <div id="header">
     	<label class="tgl">
 			<input type="checkbox" class="toggle-aod" checked />
@@ -21,6 +22,13 @@
 		</label>
 
         <h1 class="alpha">Social Identity Mapping Tool</h1>
+
+        <div id="toolbox">
+          <input type="file" id="hidden-file-upload" />
+          <input type="image" id="upload-input"   title="upload graph"   src="assets/upload-icon.png"   alt="upload graph" />
+          <input type="image" id="download-input" title="download graph" src="assets/download-icon.png" alt="download graph" />
+          <input type="image" id="delete-graph"   title="delete graph"   src="assets/trash-icon.png"    alt="delete graph" />
+        </div>
     </div>
     <div id="footer">
     	<img src="assets/panels-legend.svg" />

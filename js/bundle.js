@@ -1,4 +1,269 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/* FileSaver.js
+ * A saveAs() FileSaver implementation.
+ * 1.1.20151003
+ *
+ * By Eli Grey, http://eligrey.com
+ * License: MIT
+ *   See https://github.com/eligrey/FileSaver.js/blob/master/LICENSE.md
+ */
+
+/*global self */
+/*jslint bitwise: true, indent: 4, laxbreak: true, laxcomma: true, smarttabs: true, plusplus: true */
+
+/*! @source http://purl.eligrey.com/github/FileSaver.js/blob/master/FileSaver.js */
+
+"use strict";
+
+var saveAs = saveAs || (function (view) {
+	"use strict";
+	// IE <10 is explicitly unsupported
+	if (typeof navigator !== "undefined" && /MSIE [1-9]\./.test(navigator.userAgent)) {
+		return;
+	}
+	var doc = view.document,
+	   
+	// only get URL when necessary in case Blob.js hasn't overridden it yet
+	get_URL = function get_URL() {
+		return view.URL || view.webkitURL || view;
+	},
+	    save_link = doc.createElementNS("http://www.w3.org/1999/xhtml", "a"),
+	    can_use_save_link = ("download" in save_link),
+	    click = function click(node) {
+		var event = new MouseEvent("click");
+		node.dispatchEvent(event);
+	},
+	    is_safari = /Version\/[\d\.]+.*Safari/.test(navigator.userAgent),
+	    webkit_req_fs = view.webkitRequestFileSystem,
+	    req_fs = view.requestFileSystem || webkit_req_fs || view.mozRequestFileSystem,
+	    throw_outside = function throw_outside(ex) {
+		(view.setImmediate || view.setTimeout)(function () {
+			throw ex;
+		}, 0);
+	},
+	    force_saveable_type = "application/octet-stream",
+	    fs_min_size = 0,
+	   
+	// See https://code.google.com/p/chromium/issues/detail?id=375297#c7 and
+	// https://github.com/eligrey/FileSaver.js/commit/485930a#commitcomment-8768047
+	// for the reasoning behind the timeout and revocation flow
+	arbitrary_revoke_timeout = 500,
+	    // in ms
+	revoke = function revoke(file) {
+		var revoker = function revoker() {
+			if (typeof file === "string") {
+				// file is an object URL
+				get_URL().revokeObjectURL(file);
+			} else {
+				// file is a File
+				file.remove();
+			}
+		};
+		if (view.chrome) {
+			revoker();
+		} else {
+			setTimeout(revoker, arbitrary_revoke_timeout);
+		}
+	},
+	    dispatch = function dispatch(filesaver, event_types, event) {
+		event_types = [].concat(event_types);
+		var i = event_types.length;
+		while (i--) {
+			var listener = filesaver["on" + event_types[i]];
+			if (typeof listener === "function") {
+				try {
+					listener.call(filesaver, event || filesaver);
+				} catch (ex) {
+					throw_outside(ex);
+				}
+			}
+		}
+	},
+	    auto_bom = function auto_bom(blob) {
+		// prepend BOM for UTF-8 XML and text/* types (including HTML)
+		if (/^\s*(?:text\/\S*|application\/xml|\S*\/\S*\+xml)\s*;.*charset\s*=\s*utf-8/i.test(blob.type)) {
+			return new Blob(["﻿", blob], { type: blob.type });
+		}
+		return blob;
+	},
+	    FileSaver = function FileSaver(blob, name, no_auto_bom) {
+		if (!no_auto_bom) {
+			blob = auto_bom(blob);
+		}
+		// First try a.download, then web filesystem, then object URLs
+		var filesaver = this,
+		    type = blob.type,
+		    blob_changed = false,
+		    object_url,
+		    target_view,
+		    dispatch_all = function dispatch_all() {
+			dispatch(filesaver, "writestart progress write writeend".split(" "));
+		},
+		   
+		// on any filesys errors revert to saving with object URLs
+		fs_error = function fs_error() {
+			if (target_view && is_safari && typeof FileReader !== "undefined") {
+				// Safari doesn't allow downloading of blob urls
+				var reader = new FileReader();
+				reader.onloadend = function () {
+					var base64Data = reader.result;
+					target_view.location.href = "data:attachment/file" + base64Data.slice(base64Data.search(/[,;]/));
+					filesaver.readyState = filesaver.DONE;
+					dispatch_all();
+				};
+				reader.readAsDataURL(blob);
+				filesaver.readyState = filesaver.INIT;
+				return;
+			}
+			// don't create more object URLs than needed
+			if (blob_changed || !object_url) {
+				object_url = get_URL().createObjectURL(blob);
+			}
+			if (target_view) {
+				target_view.location.href = object_url;
+			} else {
+				var new_tab = view.open(object_url, "_blank");
+				if (new_tab == undefined && is_safari) {
+					//Apple do not allow window.open, see http://bit.ly/1kZffRI
+					view.location.href = object_url;
+				}
+			}
+			filesaver.readyState = filesaver.DONE;
+			dispatch_all();
+			revoke(object_url);
+		},
+		    abortable = function abortable(func) {
+			return function () {
+				if (filesaver.readyState !== filesaver.DONE) {
+					return func.apply(this, arguments);
+				}
+			};
+		},
+		    create_if_not_found = { create: true, exclusive: false },
+		    slice;
+		filesaver.readyState = filesaver.INIT;
+		if (!name) {
+			name = "download";
+		}
+		if (can_use_save_link) {
+			object_url = get_URL().createObjectURL(blob);
+			save_link.href = object_url;
+			save_link.download = name;
+			setTimeout(function () {
+				click(save_link);
+				dispatch_all();
+				revoke(object_url);
+				filesaver.readyState = filesaver.DONE;
+			});
+			return;
+		}
+		// Object and web filesystem URLs have a problem saving in Google Chrome when
+		// viewed in a tab, so I force save with application/octet-stream
+		// http://code.google.com/p/chromium/issues/detail?id=91158
+		// Update: Google errantly closed 91158, I submitted it again:
+		// https://code.google.com/p/chromium/issues/detail?id=389642
+		if (view.chrome && type && type !== force_saveable_type) {
+			slice = blob.slice || blob.webkitSlice;
+			blob = slice.call(blob, 0, blob.size, force_saveable_type);
+			blob_changed = true;
+		}
+		// Since I can't be sure that the guessed media type will trigger a download
+		// in WebKit, I append .download to the filename.
+		// https://bugs.webkit.org/show_bug.cgi?id=65440
+		if (webkit_req_fs && name !== "download") {
+			name += ".download";
+		}
+		if (type === force_saveable_type || webkit_req_fs) {
+			target_view = view;
+		}
+		if (!req_fs) {
+			fs_error();
+			return;
+		}
+		fs_min_size += blob.size;
+		req_fs(view.TEMPORARY, fs_min_size, abortable(function (fs) {
+			fs.root.getDirectory("saved", create_if_not_found, abortable(function (dir) {
+				var save = function save() {
+					dir.getFile(name, create_if_not_found, abortable(function (file) {
+						file.createWriter(abortable(function (writer) {
+							writer.onwriteend = function (event) {
+								target_view.location.href = file.toURL();
+								filesaver.readyState = filesaver.DONE;
+								dispatch(filesaver, "writeend", event);
+								revoke(file);
+							};
+							writer.onerror = function () {
+								var error = writer.error;
+								if (error.code !== error.ABORT_ERR) {
+									fs_error();
+								}
+							};
+							"writestart progress write abort".split(" ").forEach(function (event) {
+								writer["on" + event] = filesaver["on" + event];
+							});
+							writer.write(blob);
+							filesaver.abort = function () {
+								writer.abort();
+								filesaver.readyState = filesaver.DONE;
+							};
+							filesaver.readyState = filesaver.WRITING;
+						}), fs_error);
+					}), fs_error);
+				};
+				dir.getFile(name, { create: false }, abortable(function (file) {
+					// delete file if it already exists
+					file.remove();
+					save();
+				}), abortable(function (ex) {
+					if (ex.code === ex.NOT_FOUND_ERR) {
+						save();
+					} else {
+						fs_error();
+					}
+				}));
+			}), fs_error);
+		}), fs_error);
+	},
+	    FS_proto = FileSaver.prototype,
+	    saveAs = function saveAs(blob, name, no_auto_bom) {
+		return new FileSaver(blob, name, no_auto_bom);
+	};
+	// IE 10+ (native saveAs)
+	if (typeof navigator !== "undefined" && navigator.msSaveOrOpenBlob) {
+		return function (blob, name, no_auto_bom) {
+			if (!no_auto_bom) {
+				blob = auto_bom(blob);
+			}
+			return navigator.msSaveOrOpenBlob(blob, name || "download");
+		};
+	}
+
+	FS_proto.abort = function () {
+		var filesaver = this;
+		filesaver.readyState = filesaver.DONE;
+		dispatch(filesaver, "abort");
+	};
+	FS_proto.readyState = FS_proto.INIT = 0;
+	FS_proto.WRITING = 1;
+	FS_proto.DONE = 2;
+
+	FS_proto.error = FS_proto.onwritestart = FS_proto.onprogress = FS_proto.onwrite = FS_proto.onabort = FS_proto.onerror = FS_proto.onwriteend = null;
+
+	return saveAs;
+})(typeof self !== "undefined" && self || typeof window !== "undefined" && window || undefined.content);
+// `self` is undefined in Firefox for Android content script context
+// while `this` is nsIContentFrameMessageManager
+// with an attribute `content` that corresponds to the window
+
+if (typeof module !== "undefined" && module.exports) {
+	module.exports.saveAs = saveAs;
+} else if (typeof define !== "undefined" && define !== null && define.amd != null) {
+	define([], function () {
+		return saveAs;
+	});
+}
+
+},{}],2:[function(require,module,exports){
 
 // http://bl.ocks.org/cpbotha/5200394
 'use strict';
@@ -36,7 +301,7 @@ function group(svg) {
 
 module.exports = exports['default'];
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -50,6 +315,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 var _groupBarComponent = require('./groupBarComponent');
 
 var _groupBarComponent2 = _interopRequireDefault(_groupBarComponent);
+
+var _index = require('./index');
 
 var config = {
   WIDTH: 300,
@@ -72,6 +339,7 @@ function group(parent, data) {
     d.x = d3.event.x;
     d.y = d3.event.y;
     d3.select(this).attr('transform', 'translate(' + d.x + ',' + d.y + ')');
+    (0, _index.renderLinks)();
   });
 
   var groupInner = parent.selectAll('.group').data(data.groups);
@@ -105,9 +373,11 @@ function group(parent, data) {
   }).attr('x', config.WIDTH / 2 + 100 - 30).attr('y', 15).attr('width', 30).attr('height', 30);
 
   groupInner.call(_groupBarComponent2['default'], config);
+
+  groupInner.exit().remove();
 }
 
-function setToggleTitle(chbox, update_function, data) {
+function setToggleTitle(updateFunction, data) {
   var label = document.getElementById('toggle-label');
 
   return (function () {
@@ -118,8 +388,7 @@ function setToggleTitle(chbox, update_function, data) {
       label.innerHTML = 'Alcohol Use';
       data.client.pdoc = 'alcohol';
     }
-
-    update_function();
+    updateFunction();
   })();
 }
 
@@ -134,7 +403,7 @@ function iconScale(data) {
   }
 }
 
-},{"./groupBarComponent":3}],3:[function(require,module,exports){
+},{"./groupBarComponent":4,"./index":5}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -189,8 +458,14 @@ function barComponent(parent, config) {
 
 module.exports = exports['default'];
 
-},{"lodash":7}],4:[function(require,module,exports){
+},{"lodash":9}],5:[function(require,module,exports){
 'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.renderGroups = renderGroups;
+exports.renderLinks = renderLinks;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -214,48 +489,76 @@ var _filters = require('./filters');
 
 var _filters2 = _interopRequireDefault(_filters);
 
+var _persistMap = require('./persistMap');
+
+var body = document.querySelector('body');
+var height = body.clientHeight;
+var width = body.clientWidth;
+var padding = 20;
+
+var svg = _d32['default'].select('svg').attr('width', width).attr('height', height);
+
+// add drop shadows
+svg.call(_filters2['default']);
+
+svg.append('rect').attr('class', 'background').attr('width', width).attr('height', height);
+
+var groups = svg.append('g').attr('class', 'groups').attr('transform', 'translate(' + padding + ', 80)');
+
+var links = svg.append('g').attr('class', 'links').attr('transform', 'translate(' + padding + ', 80)');
+
+function renderGroups() {
+  _d32['default'].select('.groups').call(_group2['default'], window.data);
+}
+
+function renderLinks() {
+  _d32['default'].select('.links').call(_linkComponent2['default'], window.data);
+}
+
 _d32['default'].json('./data/data.json', function (error, data) {
   if (error) throw error;
-
   console.info('data', data);
+  window.data = data;
 
-  var body = document.querySelector('body');
-  var height = body.clientHeight;
-  var width = body.clientWidth;
-  var padding = 20;
-
-  var svg = _d32['default'].select('svg').attr('width', width).attr('height', height);
-
-  // add drop shadows
-  svg.call(_filters2['default']);
-
-  svg.append('rect').attr('class', 'background').attr('width', width).attr('height', height);
-
-  var groups = svg.append('g').attr('class', 'groups').attr('transform', 'translate(' + padding + ', 80)');
-
-  var updateGroups = function updateGroups() {
-    groups.call(_group2['default'], data);
-  };
-
-  updateGroups();
-
-  var links = svg.append('g').attr('class', 'links').attr('transform', 'translate(' + padding + ', 80)');
-
-  links.call(_linkComponent2['default'], data);
-
-  // d3.select('.toggle-aod').on('click', toggleAod(updateGroups, data));
-  _d32['default'].select('.toggle-aod').on('change', function () {
-    (0, _group.setToggleTitle)(this, updateGroups, data);
-  });
+  renderGroups();
+  renderLinks();
 });
 
-},{"./filters":1,"./group":2,"./linkComponent":5,"d3":6,"lodash":7}],5:[function(require,module,exports){
+// ============================================================
+// UI Elements / event handlers
+// ============================================================
+
+_d32['default'].select('.toggle-aod').on('change', function () {
+  (0, _group.setToggleTitle)(renderGroups, window.data);
+});
+
+_d32['default'].select('#download-input').on('click', function () {
+  (0, _persistMap.saveFile)(window.data);
+});
+_d32['default'].select('#upload-input').on('click', _persistMap.loadFile);
+_d32['default'].select('#hidden-file-upload').on('change', function () {
+  (0, _persistMap.fileUpload)(this);
+});
+_d32['default'].select('#delete-graph').on('click', _persistMap.deleteMap);
+
+// warn the user when leaving
+// window.onbeforeunload = function() {
+//   return 'Ensure you save your map before closing or refreshing this page!';
+// };
+
+},{"./filters":2,"./group":3,"./linkComponent":6,"./persistMap":7,"d3":8,"lodash":9}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 exports['default'] = drawLink;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _d3 = require('d3');
+
+var _d32 = _interopRequireDefault(_d3);
 
 var _group = require('./group');
 
@@ -265,18 +568,21 @@ function drawLink(parent, data) {
 
   var linkContainers = parent.selectAll('.link').data(data.links);
 
-  var newLink = linkContainers.enter().append('g').attr('class', 'link');
+  // enter
+  linkContainers.enter().append('g').attr('class', 'link').append('path');
 
-  newLink.each(function (d) {
-    link(linkContainers, d, data);
+  // update
+  linkContainers.each(function (links) {
+    console.log('links', this, links);
+    setLinkPath(this, links, data);
   });
+
+  // exit
+  linkContainers.exit().remove();
 }
 
-function link(parent, d, data) {
-  console.log('link: parent', parent, parent.node().__data__);
+function setLinkPath(parent, d, data) {
 
-  // get the source location
-  // get the target location
   var source = {};
   source.x = data.groups[d.source].x;
   source.y = data.groups[d.source].y;
@@ -287,6 +593,11 @@ function link(parent, d, data) {
 
   var sourceOffset = {};
   var targetOffset = {};
+
+  // all of these calculations need to be ranges,
+  // not simple point comparisons of the group's origin!
+  // probably define n,s,e,w anchor points on ecah group,
+  // then possibly shoose the shortest connection from source to target?
 
   if (source.x < target.x) {
     sourceOffset.x = source.x + _group.config.WIDTH;
@@ -312,17 +623,91 @@ function link(parent, d, data) {
       }
   }
 
-  console.log('source, target', source, target);
   var linkPath = "M" + [sourceOffset.x, sourceOffset.y] + "L" + [targetOffset.x, targetOffset.y];
-  // data.coordinates.slice(1).forEach(function(knot) {
-  //   linkPath += " L" + knot;
-  // });
-  // console.log('drawSimpleEdge', linkPath);
-  parent.append('path').attr('d', linkPath);
+
+  _d32['default'].select(parent).select('path').attr('d', linkPath);
 }
 module.exports = exports['default'];
 
-},{"./group":2}],6:[function(require,module,exports){
+},{"./group":3,"d3":8}],7:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.saveFile = saveFile;
+exports.loadFile = loadFile;
+exports.fileUpload = fileUpload;
+exports.deleteMap = deleteMap;
+
+var _index = require('./index');
+
+var _FileSaver = require('./FileSaver');
+
+function saveFile(data) {
+  var blob = new Blob([window.JSON.stringify(data)], {
+    type: 'text/plain;charset=utf-8'
+  });
+  var date = new Date().toISOString().slice(0, 10);
+  (0, _FileSaver.saveAs)(blob, 'social-identity-map-' + date + '.json');
+}
+
+function loadFile() {
+  document.getElementById('hidden-file-upload').click();
+}
+
+;
+
+function fileUpload(input) {
+  if (window.File && window.FileReader && window.FileList && window.Blob) {
+    var file;
+
+    var _ret = (function () {
+
+      var uploadFile = input.files[0];
+      var filereader = new window.FileReader();
+
+      filereader.onload = function () {
+        var txtRes = filereader.result;
+        // TODO better error handling
+        console.log('txtRes', txtRes);
+
+        try {
+          window.data = JSON.parse(txtRes);
+          console.log('data', window.data);
+
+          (0, _index.renderGroups)(window.data);
+          (0, _index.renderLinks)(window.data);
+        } catch (err) {
+          window.alert('Error parsing uploaded file\n          error message: ' + err.message);
+          return null;
+        }
+      };
+      return {
+        v: filereader.readAsText(uploadFile)
+      };
+    })();
+
+    if (typeof _ret === 'object') return _ret.v;
+  } else {
+    alert('Your browser won\'t let you save this graph - try upgrading your browser to IE 10+ or Chrome or Firefox.');
+  }
+}
+
+function deleteMap(data) {
+  var initialState = {
+    "client": {
+      "pdoc": null
+    },
+    "groups": [],
+    "links": []
+  };
+  window.data = initialState;
+  (0, _index.renderGroups)();
+  (0, _index.renderLinks)();
+}
+
+},{"./FileSaver":1,"./index":5}],8:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.6"
@@ -1507,7 +1892,7 @@ module.exports = exports['default'];
           svg.remove();
         }
       }
-      if (d3_mouse_bug44083) point.x = e.pageX, point.y = e.pageY; else point.x = e.clientX,
+      if (d3_mouse_bug44083) point.x = e.pageX, point.y = e.pageY; else point.x = e.clientX, 
       point.y = e.clientY;
       point = point.matrixTransform(container.getScreenCTM().inverse());
       return [ point.x, point.y ];
@@ -1877,7 +2262,7 @@ module.exports = exports['default'];
     }
     function mousewheeled() {
       var dispatch = event.of(this, arguments);
-      if (mousewheelTimer) clearTimeout(mousewheelTimer); else d3_selection_interrupt.call(this),
+      if (mousewheelTimer) clearTimeout(mousewheelTimer); else d3_selection_interrupt.call(this), 
       translate0 = location(center0 = center || d3.mouse(this)), zoomstarted(dispatch);
       mousewheelTimer = setTimeout(function() {
         mousewheelTimer = null;
@@ -2247,7 +2632,7 @@ module.exports = exports['default'];
   d3.xhr = d3_xhrType(d3_identity);
   function d3_xhrType(response) {
     return function(url, mimeType, callback) {
-      if (arguments.length === 2 && typeof mimeType === "function") callback = mimeType,
+      if (arguments.length === 2 && typeof mimeType === "function") callback = mimeType, 
       mimeType = null;
       return d3_xhr(url, mimeType, response, callback);
     };
@@ -3085,7 +3470,7 @@ module.exports = exports['default'];
     return n ? (date.y = d3_time_expandYear(+n[0]), i + n[0].length) : -1;
   }
   function d3_time_parseZone(date, string, i) {
-    return /^[+-]\d{4}$/.test(string = string.slice(i, i + 5)) ? (date.Z = -string,
+    return /^[+-]\d{4}$/.test(string = string.slice(i, i + 5)) ? (date.Z = -string, 
     i + 5) : -1;
   }
   function d3_time_expandYear(d) {
@@ -3278,7 +3663,7 @@ module.exports = exports['default'];
     var λ00, φ00, λ0, cosφ0, sinφ0;
     d3_geo_area.point = function(λ, φ) {
       d3_geo_area.point = nextPoint;
-      λ0 = (λ00 = λ) * d3_radians, cosφ0 = Math.cos(φ = (φ00 = φ) * d3_radians / 2 + π / 4),
+      λ0 = (λ00 = λ) * d3_radians, cosφ0 = Math.cos(φ = (φ00 = φ) * d3_radians / 2 + π / 4), 
       sinφ0 = Math.sin(φ);
     };
     function nextPoint(λ, φ) {
@@ -5107,7 +5492,7 @@ module.exports = exports['default'];
       return _ ? center([ -_[1], _[0] ]) : (_ = center(), [ _[1], -_[0] ]);
     };
     projection.rotate = function(_) {
-      return _ ? rotate([ _[0], _[1], _.length > 2 ? _[2] + 90 : 90 ]) : (_ = rotate(),
+      return _ ? rotate([ _[0], _[1], _.length > 2 ? _[2] + 90 : 90 ]) : (_ = rotate(), 
       [ _[0], _[1], _[2] - 90 ]);
     };
     return rotate([ 0, 0, 90 ]);
@@ -5961,7 +6346,7 @@ module.exports = exports['default'];
     };
     quadtree.extent = function(_) {
       if (!arguments.length) return x1 == null ? null : [ [ x1, y1 ], [ x2, y2 ] ];
-      if (_ == null) x1 = y1 = x2 = y2 = null; else x1 = +_[0][0], y1 = +_[0][1], x2 = +_[1][0],
+      if (_ == null) x1 = y1 = x2 = y2 = null; else x1 = +_[0][0], y1 = +_[0][1], x2 = +_[1][0], 
       y2 = +_[1][1];
       return quadtree;
     };
@@ -7665,7 +8050,7 @@ module.exports = exports['default'];
         return d3_layout_treemapPad(node, x);
       }
       var type;
-      pad = (padding = x) == null ? d3_layout_treemapPadNull : (type = typeof x) === "function" ? padFunction : type === "number" ? (x = [ x, x, x, x ],
+      pad = (padding = x) == null ? d3_layout_treemapPadNull : (type = typeof x) === "function" ? padFunction : type === "number" ? (x = [ x, x, x, x ], 
       padConstant) : padConstant;
       return treemap;
     };
@@ -7965,7 +8350,7 @@ module.exports = exports['default'];
     scale.tickFormat = function(n, format) {
       if (!arguments.length) return d3_scale_logFormat;
       if (arguments.length < 2) format = d3_scale_logFormat; else if (typeof format !== "function") format = d3.format(format);
-      var k = Math.max(.1, n / scale.ticks().length), f = positive ? (e = 1e-12, Math.ceil) : (e = -1e-12,
+      var k = Math.max(.1, n / scale.ticks().length), f = positive ? (e = 1e-12, Math.ceil) : (e = -1e-12, 
       Math.floor), e;
       return function(d) {
         return d / pow(f(log(d) + e)) <= k ? format(d) : "";
@@ -8065,7 +8450,7 @@ module.exports = exports['default'];
     };
     scale.rangePoints = function(x, padding) {
       if (arguments.length < 2) padding = 0;
-      var start = x[0], stop = x[1], step = domain.length < 2 ? (start = (start + stop) / 2,
+      var start = x[0], stop = x[1], step = domain.length < 2 ? (start = (start + stop) / 2, 
       0) : (stop - start) / (domain.length - 1 + padding);
       range = steps(start + step * padding / 2, step);
       rangeBand = 0;
@@ -8077,7 +8462,7 @@ module.exports = exports['default'];
     };
     scale.rangeRoundPoints = function(x, padding) {
       if (arguments.length < 2) padding = 0;
-      var start = x[0], stop = x[1], step = domain.length < 2 ? (start = stop = Math.round((start + stop) / 2),
+      var start = x[0], stop = x[1], step = domain.length < 2 ? (start = stop = Math.round((start + stop) / 2), 
       0) : (stop - start) / (domain.length - 1 + padding) | 0;
       range = steps(start + Math.round(step * padding / 2 + (stop - start - (domain.length - 1 + padding) * step) / 2), step);
       rangeBand = 0;
@@ -8500,7 +8885,7 @@ module.exports = exports['default'];
     return points.length < 4 ? d3_svg_lineLinear(points) : points[1] + d3_svg_lineHermite(points.slice(1, -1), d3_svg_lineCardinalTangents(points, tension));
   }
   function d3_svg_lineCardinalClosed(points, tension) {
-    return points.length < 3 ? d3_svg_lineLinear(points) : points[0] + d3_svg_lineHermite((points.push(points[0]),
+    return points.length < 3 ? d3_svg_lineLinear(points) : points[0] + d3_svg_lineHermite((points.push(points[0]), 
     points), d3_svg_lineCardinalTangents([ points[points.length - 2] ].concat(points, [ points[1] ]), tension));
   }
   function d3_svg_lineCardinal(points, tension) {
@@ -9258,7 +9643,7 @@ module.exports = exports['default'];
         var g = d3.select(this);
         var scale0 = this.__chart__ || scale, scale1 = this.__chart__ = scale.copy();
         var ticks = tickValues == null ? scale1.ticks ? scale1.ticks.apply(scale1, tickArguments_) : scale1.domain() : tickValues, tickFormat = tickFormat_ == null ? scale1.tickFormat ? scale1.tickFormat.apply(scale1, tickArguments_) : d3_identity : tickFormat_, tick = g.selectAll(".tick").data(ticks, scale1), tickEnter = tick.enter().insert("g", ".domain").attr("class", "tick").style("opacity", ε), tickExit = d3.transition(tick.exit()).style("opacity", ε).remove(), tickUpdate = d3.transition(tick.order()).style("opacity", 1), tickSpacing = Math.max(innerTickSize, 0) + tickPadding, tickTransform;
-        var range = d3_scaleRange(scale1), path = g.selectAll(".domain").data([ 0 ]), pathUpdate = (path.enter().append("path").attr("class", "domain"),
+        var range = d3_scaleRange(scale1), path = g.selectAll(".domain").data([ 0 ]), pathUpdate = (path.enter().append("path").attr("class", "domain"), 
         d3.transition(path));
         tickEnter.append("line");
         tickEnter.append("text");
@@ -9827,7 +10212,7 @@ module.exports = exports['default'];
   if (typeof define === "function" && define.amd) define(d3); else if (typeof module === "object" && module.exports) module.exports = d3;
   this.d3 = d3;
 }();
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -22183,7 +22568,7 @@ module.exports = exports['default'];
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}]},{},[4])
+},{}]},{},[5])
 
-// note: I've manually hacked relative asset/ urls!
+
 //# sourceMappingURL=bundle.js.map
