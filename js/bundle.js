@@ -316,6 +316,8 @@ var _groupBarComponent = require('./groupBarComponent');
 
 var _groupBarComponent2 = _interopRequireDefault(_groupBarComponent);
 
+var _index = require('./index');
+
 var config = {
   WIDTH: 300,
   HEIGHT: 200
@@ -337,6 +339,7 @@ function group(parent, data) {
     d.x = d3.event.x;
     d.y = d3.event.y;
     d3.select(this).attr('transform', 'translate(' + d.x + ',' + d.y + ')');
+    (0, _index.renderLinks)();
   });
 
   var groupInner = parent.selectAll('.group').data(data.groups);
@@ -370,9 +373,11 @@ function group(parent, data) {
   }).attr('x', config.WIDTH / 2 + 100 - 30).attr('y', 15).attr('width', 30).attr('height', 30);
 
   groupInner.call(_groupBarComponent2['default'], config);
+
+  groupInner.exit().remove();
 }
 
-function setToggleTitle(chbox, update_function, data) {
+function setToggleTitle(updateFunction, data) {
   var label = document.getElementById('toggle-label');
 
   return (function () {
@@ -383,8 +388,7 @@ function setToggleTitle(chbox, update_function, data) {
       label.innerHTML = 'Alcohol Use';
       data.client.pdoc = 'alcohol';
     }
-
-    update_function();
+    updateFunction();
   })();
 }
 
@@ -399,7 +403,7 @@ function iconScale(data) {
   }
 }
 
-},{"./groupBarComponent":4}],4:[function(require,module,exports){
+},{"./groupBarComponent":4,"./index":5}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -457,6 +461,12 @@ module.exports = exports['default'];
 },{"lodash":9}],5:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.renderGroups = renderGroups;
+exports.renderLinks = renderLinks;
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _d3 = require('d3');
@@ -481,58 +491,60 @@ var _filters2 = _interopRequireDefault(_filters);
 
 var _persistMap = require('./persistMap');
 
+var body = document.querySelector('body');
+var height = body.clientHeight;
+var width = body.clientWidth;
+var padding = 20;
+
+var svg = _d32['default'].select('svg').attr('width', width).attr('height', height);
+
+// add drop shadows
+svg.call(_filters2['default']);
+
+svg.append('rect').attr('class', 'background').attr('width', width).attr('height', height);
+
+var groups = svg.append('g').attr('class', 'groups').attr('transform', 'translate(' + padding + ', 80)');
+
+var links = svg.append('g').attr('class', 'links').attr('transform', 'translate(' + padding + ', 80)');
+
+function renderGroups() {
+  _d32['default'].select('.groups').call(_group2['default'], window.data);
+}
+
+function renderLinks() {
+  _d32['default'].select('.links').call(_linkComponent2['default'], window.data);
+}
+
 _d32['default'].json('./data/data.json', function (error, data) {
   if (error) throw error;
-
   console.info('data', data);
+  window.data = data;
 
-  var body = document.querySelector('body');
-  var height = body.clientHeight;
-  var width = body.clientWidth;
-  var padding = 20;
-
-  var svg = _d32['default'].select('svg').attr('width', width).attr('height', height);
-
-  // add drop shadows
-  svg.call(_filters2['default']);
-
-  svg.append('rect').attr('class', 'background').attr('width', width).attr('height', height);
-
-  var groups = svg.append('g').attr('class', 'groups').attr('transform', 'translate(' + padding + ', 80)');
-
-  var updateGroups = function updateGroups() {
-    groups.call(_group2['default'], data);
-  };
-
-  updateGroups();
-
-  var links = svg.append('g').attr('class', 'links').attr('transform', 'translate(' + padding + ', 80)');
-
-  links.call(_linkComponent2['default'], data);
-
-  // d3.select('.toggle-aod').on('click', toggleAod(updateGroups, data));
-  _d32['default'].select('.toggle-aod').on('change', function () {
-    (0, _group.setToggleTitle)(this, updateGroups, data);
-  });
-
-  // ============================================================
-  // File Saving
-  // ============================================================
-
-  _d32['default'].select('#download-input').on('click', function () {
-    (0, _persistMap.saveFile)(data);
-  });
-  _d32['default'].select('#upload-input').on('click', _persistMap.loadFile);
-  _d32['default'].select('#hidden-file-upload').on('change', _persistMap.fileUpload);
-  _d32['default'].select('#delete-graph').on('click', function () {
-    data = (0, _persistMap.deleteMap)();
-  });
-
-  // warn the user when leaving
-  // window.onbeforeunload = function() {
-  //   return 'Ensure you save your map before closing or refreshing this page!';
-  // };
+  renderGroups();
+  renderLinks();
 });
+
+// ============================================================
+// UI Elements / event handlers
+// ============================================================
+
+_d32['default'].select('.toggle-aod').on('change', function () {
+  (0, _group.setToggleTitle)(renderGroups, window.data);
+});
+
+_d32['default'].select('#download-input').on('click', function () {
+  (0, _persistMap.saveFile)(window.data);
+});
+_d32['default'].select('#upload-input').on('click', _persistMap.loadFile);
+_d32['default'].select('#hidden-file-upload').on('change', function () {
+  (0, _persistMap.fileUpload)(this);
+});
+_d32['default'].select('#delete-graph').on('click', _persistMap.deleteMap);
+
+// warn the user when leaving
+// window.onbeforeunload = function() {
+//   return 'Ensure you save your map before closing or refreshing this page!';
+// };
 
 },{"./filters":2,"./group":3,"./linkComponent":6,"./persistMap":7,"d3":8,"lodash":9}],6:[function(require,module,exports){
 'use strict';
@@ -550,15 +562,20 @@ function drawLink(parent, data) {
 
   var linkContainers = parent.selectAll('.link').data(data.links);
 
-  var newLink = linkContainers.enter().append('g').attr('class', 'link');
+  // enter
+  linkContainers.enter().append('g').attr('class', 'link').append('path');
 
-  newLink.each(function (d) {
-    link(linkContainers, d, data);
+  // update
+  linkContainers.each(function (d) {
+    setLinkPath(linkContainers, d, data);
   });
+
+  // exit
+  linkContainers.exit().remove();
 }
 
-function link(parent, d, data) {
-  console.log('link: parent', parent, parent.node().__data__);
+function setLinkPath(parent, d, data) {
+  // console.log('link: parent', parent, parent.node().__data__);
 
   // get the source location
   // get the target location
@@ -597,13 +614,13 @@ function link(parent, d, data) {
       }
   }
 
-  console.log('source, target', source, target);
+  // console.log('source, target', source, target);
   var linkPath = "M" + [sourceOffset.x, sourceOffset.y] + "L" + [targetOffset.x, targetOffset.y];
-  // data.coordinates.slice(1).forEach(function(knot) {
-  //   linkPath += " L" + knot;
-  // });
-  // console.log('drawSimpleEdge', linkPath);
-  parent.append('path').attr('d', linkPath);
+
+  parent.each(function (el) {
+    // console.log('el', el);
+    d3.select(this).select('path').attr('d', linkPath);
+  });
 }
 module.exports = exports['default'];
 
@@ -618,14 +635,16 @@ exports.loadFile = loadFile;
 exports.fileUpload = fileUpload;
 exports.deleteMap = deleteMap;
 
-var _FileSaverJs = require('./FileSaver.js');
+var _index = require('./index');
+
+var _FileSaver = require('./FileSaver');
 
 function saveFile(data) {
   var blob = new Blob([window.JSON.stringify(data)], {
     type: 'text/plain;charset=utf-8'
   });
   var date = new Date().toISOString().slice(0, 10);
-  (0, _FileSaverJs.saveAs)(blob, 'social-identity-map-' + date + '.json');
+  (0, _FileSaver.saveAs)(blob, 'social-identity-map-' + date + '.json');
 }
 
 function loadFile() {
@@ -634,54 +653,56 @@ function loadFile() {
 
 ;
 
-function fileUpload() {
-  var _this = this;
-
+function fileUpload(input) {
   if (window.File && window.FileReader && window.FileList && window.Blob) {
-    (function () {
-      var uploadFile = _this.files[0];
+    var file;
+
+    var _ret = (function () {
+
+      var uploadFile = input.files[0];
       var filereader = new window.FileReader();
 
       filereader.onload = function () {
         var txtRes = filereader.result;
         // TODO better error handling
-        try {
-          (function () {
-            var jsonObj = JSON.parse(txtRes);
-            thisGraph.deleteGraph(true);
-            thisGraph.nodes = jsonObj.nodes;
-            thisGraph.setIdCt(jsonObj.nodes.length + 1);
+        console.log('txtRes', txtRes);
 
-            var newEdges = jsonObj.edges;
-            newEdges.forEach(function (e, i) {
-              newEdges[i] = { source: thisGraph.nodes.filter(function (n) {
-                  return n.id == e.source;
-                })[0],
-                target: thisGraph.nodes.filter(function (n) {
-                  return n.id == e.target;
-                })[0] };
-            });
-            thisGraph.edges = newEdges;
-            thisGraph.updateGraph();
-          })();
+        try {
+          window.data = JSON.parse(txtRes);
+          console.log('data', window.data);
+
+          (0, _index.renderGroups)(window.data);
+          (0, _index.renderLinks)(window.data);
         } catch (err) {
           window.alert('Error parsing uploaded file\n          error message: ' + err.message);
-          return;
+          return null;
         }
       };
-      filereader.readAsText(uploadFile);
+      return {
+        v: filereader.readAsText(uploadFile)
+      };
     })();
+
+    if (typeof _ret === 'object') return _ret.v;
   } else {
     alert('Your browser won\'t let you save this graph - try upgrading your browser to IE 10+ or Chrome or Firefox.');
   }
 }
 
 function deleteMap(data) {
-  d3.select('#social-identity-map').selectAll('*').remove();
-  return {};
+  var initialState = {
+    "client": {
+      "pdoc": null
+    },
+    "groups": [],
+    "links": []
+  };
+  window.data = initialState;
+  (0, _index.renderGroups)();
+  (0, _index.renderLinks)();
 }
 
-},{"./FileSaver.js":1}],8:[function(require,module,exports){
+},{"./FileSaver":1,"./index":5}],8:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.6"
