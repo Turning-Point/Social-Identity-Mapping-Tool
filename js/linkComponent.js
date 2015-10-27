@@ -26,10 +26,7 @@ export default function drawLink(parent, data) {
 
 
 function setLinkPath(parent, d, data) {
-  // console.log('link: parent', parent, parent.node().__data__);
 
-  // get the source location
-  // get the target location
   let source = {};
   source.x = data.groups[d.source].x;
   source.y = data.groups[d.source].y;
@@ -40,6 +37,11 @@ function setLinkPath(parent, d, data) {
 
   let sourceOffset = {};
   let targetOffset = {};
+
+  // all of these calculations need to be ranges,
+  // not simple point comparisons of the group's origin!
+  // probably define n,s,e,w anchor points on ecah group,
+  // then possibly shoose the shortest connection from source to target?
 
   if (source.x < target.x) {
     sourceOffset.x = source.x + config.WIDTH;
@@ -70,7 +72,6 @@ function setLinkPath(parent, d, data) {
 
   }
 
-  // console.log('source, target', source, target);
   var linkPath =
     "M" + [sourceOffset.x, sourceOffset.y] +
     "L" + [targetOffset.x, targetOffset.y];
