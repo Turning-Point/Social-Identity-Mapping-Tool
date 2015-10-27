@@ -57,7 +57,7 @@ d3.json('./data/data.json', function (error, data) {
   d3.select('#download-input').on('click', () => { saveFile(data); });
   d3.select('#upload-input').on('click', loadFile);
   d3.select('#hidden-file-upload').on('change', fileUpload);
-  d3.select('#delete-graph').on('click', deleteMap);
+  d3.select('#delete-graph').on('click', () => { data = deleteMap(); });
 
   // warn the user when leaving
   // window.onbeforeunload = function() {

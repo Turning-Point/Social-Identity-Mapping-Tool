@@ -524,7 +524,9 @@ _d32['default'].json('./data/data.json', function (error, data) {
   });
   _d32['default'].select('#upload-input').on('click', _persistMap.loadFile);
   _d32['default'].select('#hidden-file-upload').on('change', _persistMap.fileUpload);
-  _d32['default'].select('#delete-graph').on('click', _persistMap.deleteMap);
+  _d32['default'].select('#delete-graph').on('click', function () {
+    data = (0, _persistMap.deleteMap)();
+  });
 
   // warn the user when leaving
   // window.onbeforeunload = function() {
@@ -674,8 +676,9 @@ function fileUpload() {
   }
 }
 
-function deleteMap() {
-  console.log('todo: delete map');
+function deleteMap(data) {
+  d3.select('#social-identity-map').selectAll('*').remove();
+  return {};
 }
 
 },{"./FileSaver.js":1}],8:[function(require,module,exports){

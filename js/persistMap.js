@@ -53,6 +53,7 @@ export function fileUpload() {
   }
 }
 
-export function deleteMap() {
-  console.log('todo: delete map');
+export function deleteMap(data) {
+  d3.select('#social-identity-map').selectAll('*').remove();
+  return {};
 }
